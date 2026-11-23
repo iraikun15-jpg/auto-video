@@ -132,23 +132,20 @@ const Beam: React.FC<{ f: number }> = ({ f }) => {
   mats[0].opacity = a;
   mats[1].opacity = 0.65 * a;
   mats[2].opacity = 0.28 * a + 0.5 * charge;
+  // 要素は常に置いたまま visible で出し入れする（途中で付け外しすると描画が壊れることがあるため）
   return (
     <group position={MOUTH_LOCAL.toArray()}>
-      {a > 0.01 ? (
-        <group rotation={[0, 0, -Math.PI / 2]}>
-          {[0.3, 0.65, 1.3].map((r, i) => (
-            <mesh key={i} material={mats[i]} position={[0, len / 2, 0]} scale={[r * fl * (0.6 + 0.4 * a), len, r * fl * (0.6 + 0.4 * a)]}>
-              <cylinderGeometry args={[1, 0.75, 1, 10, 1, true]} />
-            </mesh>
-          ))}
-        </group>
-      ) : null}
+      <group rotation={[0, 0, -Math.PI / 2]} visible={a > 0.01}>
+        {[0.3, 0.65, 1.3].map((r, i) => (
+          <mesh key={i} material={mats[i]} position={[0, len / 2, 0]} scale={[r * fl * (0.6 + 0.4 * a), Math.max(0.01, len), r * fl * (0.6 + 0.4 * a)]}>
+            <cylinderGeometry args={[1, 0.75, 1, 10, 1, true]} />
+          </mesh>
+        ))}
+      </group>
       {/* 口元の光 */}
-      {a + charge > 0.01 ? (
-        <mesh material={mats[2]} scale={0.6 + charge * 0.8 + a * 1.2}>
-          <icosahedronGeometry args={[1, 1]} />
-        </mesh>
-      ) : null}
+      <mesh material={mats[2]} scale={0.6 + charge * 0.8 + a * 1.2} visible={a + charge > 0.01}>
+        <icosahedronGeometry args={[1, 1]} />
+      </mesh>
       <pointLight color="#8fd8ff" intensity={(a * 60 + charge * 12) * fl} distance={45} decay={1.6} />
     </group>
   );

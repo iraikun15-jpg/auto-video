@@ -131,19 +131,17 @@ const Fin: React.FC<{ base: V3; h: number; w: number; lean: number; out?: number
 }) => {
   const glow = React.useContext(FinGlowContext);
   const g = glow > 0 ? glowLevel(glow, s) : 0;
+  // マテリアルは常に同じものを使い、発光の強さだけを変える（付け替えると描画が壊れるため）
+  const m = React.useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({ color: c, flatShading: true, roughness: 0.92, metalness: 0, side: THREE.DoubleSide, emissive: FIN_GLOW_COLOR, emissiveIntensity: 0 }),
+    [c],
+  );
+  m.color.set(c).lerp(new THREE.Color("#e8f8ff"), g * 0.6);
+  m.emissiveIntensity = g * 2.2;
+  m.roughness = 0.92 - g * 0.3;
   return (
-    <mesh position={base} rotation={[out, 0, lean]} scale={[w, h, t]} geometry={finGeo} castShadow receiveShadow material={g > 0 ? undefined : mat(c)}>
-      {g > 0 ? (
-        <meshStandardMaterial
-          color={new THREE.Color(c).lerp(new THREE.Color("#e8f8ff"), g * 0.6)}
-          emissive={FIN_GLOW_COLOR}
-          emissiveIntensity={g * 2.2}
-          flatShading
-          roughness={0.6}
-          side={THREE.DoubleSide}
-        />
-      ) : null}
-    </mesh>
+    <mesh position={base} rotation={[out, 0, lean]} scale={[w, h, t]} geometry={finGeo} material={m} castShadow receiveShadow />
   );
 };
 
