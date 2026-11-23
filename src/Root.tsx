@@ -3,6 +3,7 @@ import { ShortVideo } from "./ShortVideo";
 import { Ep2, Ep2Segments, EP2_TOTAL_FRAMES } from "./ep2/Ep2";
 import { Ep2Thumbnail } from "./ep2/Thumbnail";
 import { FPS } from "./ep2/common";
+import { KaijuTest, KAIJU_FRAMES } from "./kaiju/KaijuTest";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -29,6 +30,16 @@ export const RemotionRoot: React.FC = () => {
         />
       ))}
       <Still id="Ep2Thumbnail" component={Ep2Thumbnail} width={1080} height={1920} />
+
+      {/* ローポリ3Dテスト（Three.js） */}
+      <Composition
+        id="KaijuTest"
+        component={KaijuTest}
+        width={1080}
+        height={1920}
+        fps={30}
+        durationInFrames={KAIJU_FRAMES}
+      />
 
       {/* 最初に作ったサンプル */}
       <Composition
