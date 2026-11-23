@@ -1,0 +1,40 @@
+{
+  "fps": 30,
+  "frames": 1200,
+  "step": 38,
+  "land": 0.66,
+  "stride": 2.8,
+  "startX": -34,
+  "shoreX": -24,
+  "walks": [
+    { "start": 0, "steps": 3 },
+    { "start": 150, "steps": 4 },
+    { "start": 368, "steps": 2 },
+    { "start": 750, "steps": 2 },
+    { "start": 984, "steps": 2 }
+  ],
+  "roars": [
+    { "start": 108, "dur": 40, "kind": "short" },
+    { "start": 1078, "dur": 92, "kind": "long" }
+  ],
+  "tailSweeps": [
+    { "start": 306, "dur": 56, "dir": -1 },
+    { "start": 828, "dur": 52, "dir": -1 }
+  ],
+  "charges": [
+    { "start": 450, "end": 540 },
+    { "start": 882, "end": 906 }
+  ],
+  "beams": [
+    { "start": 540, "end": 720, "yawFrom": 0.62, "yawTo": -0.7 },
+    { "start": 906, "end": 981, "yawFrom": -0.35, "yawTo": 0.45 }
+  ],
+  "explosionEvery": 6,
+  "scenes": [
+    { "from": 0, "to": 150, "name": "登場" },
+    { "from": 150, "to": 450, "name": "進撃と破壊" },
+    { "from": 450, "to": 750, "name": "熱線" },
+    { "from": 750, "to": 1050, "name": "破壊の継続" },
+    { "from": 1050, "to": 1200, "name": "締め" }
+  ]
+}

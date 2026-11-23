@@ -5,6 +5,7 @@ import { Ep2Thumbnail } from "./ep2/Thumbnail";
 import { FPS } from "./ep2/common";
 import { KaijuTest, KAIJU_FRAMES } from "./kaiju/KaijuTest";
 import { KaijuTestV2, KAIJU_V2_FRAMES } from "./kaiju/KaijuTestV2";
+import { KaijuV4, KAIJU_V4_FRAMES } from "./kaiju/v4/KaijuV4";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -49,6 +50,17 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
         fps={30}
         durationInFrames={KAIJU_V2_FRAMES}
+      />
+
+      {/* 本編テスト v4：東京破壊（約40秒・音あり） */}
+      <Composition
+        id="KaijuV4"
+        component={KaijuV4}
+        width={1080}
+        height={1920}
+        fps={30}
+        durationInFrames={KAIJU_V4_FRAMES}
+        defaultProps={{ withAudio: true }}
       />
 
       {/* 最初に作ったサンプル */}

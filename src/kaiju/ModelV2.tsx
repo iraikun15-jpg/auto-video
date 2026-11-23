@@ -14,6 +14,14 @@ import { Joint, KaijuPose, PALETTE, Spike } from "./Model";
 type V3 = [number, number, number];
 type V2 = [number, number];
 
+/**
+ * 背びれの発光（v4 の熱線チャージ用）。0=発光なし、1=尾の先から頭まで全部光る。
+ * 値の増加に合わせて尾の先→頭の順に光が伝わる。v2 では使わない（常に0）。
+ */
+export const FinGlowContext = React.createContext(0);
+export const FIN_GLOW_COLOR = "#8fdcff";
+const glowLevel = (glow: number, s: number) => Math.max(0, Math.min(1, (glow * 1.25 - s) / 0.15));
+
 const matCache = new Map<string, THREE.MeshStandardMaterial>();
 const mat = (color: string) => {
   let m = matCache.get(color);
@@ -110,8 +118,8 @@ const finGeo = (() => {
   return g;
 })();
 
-/** 背びれ1枚。base=付け根の中心, h=高さ, w=幅, lean=後ろへの傾き(rad), out=左右への開き(rad) */
-const Fin: React.FC<{ base: V3; h: number; w: number; lean: number; out?: number; c?: string; t?: number }> = ({
+/** 背びれ1枚。base=付け根の中心, h=高さ, w=幅, lean=後ろへの傾き(rad), out=左右への開き(rad), s=背骨上の位置(0=尾の先,1=頭) */
+const Fin: React.FC<{ base: V3; h: number; w: number; lean: number; out?: number; c?: string; t?: number; s?: number }> = ({
   base,
   h,
   w,
@@ -119,17 +127,25 @@ const Fin: React.FC<{ base: V3; h: number; w: number; lean: number; out?: number
   out = 0,
   c = PALETTE.fin,
   t = 0.2,
-}) => (
-  <mesh
-    position={base}
-    rotation={[out, 0, lean]}
-    scale={[w, h, t]}
-    geometry={finGeo}
-    material={mat(c)}
-    castShadow
-    receiveShadow
-  />
-);
+  s = 0.5,
+}) => {
+  const glow = React.useContext(FinGlowContext);
+  const g = glow > 0 ? glowLevel(glow, s) : 0;
+  return (
+    <mesh position={base} rotation={[out, 0, lean]} scale={[w, h, t]} geometry={finGeo} castShadow receiveShadow material={g > 0 ? undefined : mat(c)}>
+      {g > 0 ? (
+        <meshStandardMaterial
+          color={new THREE.Color(c).lerp(new THREE.Color("#e8f8ff"), g * 0.6)}
+          emissive={FIN_GLOW_COLOR}
+          emissiveIntensity={g * 2.2}
+          flatShading
+          roughness={0.6}
+          side={THREE.DoubleSide}
+        />
+      ) : null}
+    </mesh>
+  );
+};
 
 // 胴体の背骨ライン上の背びれ [x, y, 高さ, 幅, 後傾]（首の後ろ→腰）
 const BACK_FINS: [number, number, number, number, number][] = [
@@ -145,7 +161,7 @@ const BackFins: React.FC = () => (
   <>
     {/* 中央列 */}
     {BACK_FINS.map(([x, y, h, w, lean]) => (
-      <Fin key={`c${y}`} base={[x + 0.15, y, 0]} h={h} w={w} lean={lean} t={0.24} />
+      <Fin key={`c${y}`} base={[x + 0.15, y, 0]} h={h} w={w} lean={lean} t={0.24} s={0.95 - BACK_FINS.findIndex((b) => b[1] === y) * 0.08} />
     ))}
     {/* 左右の列：中央列の間に互い違いで、少し外へ開く */}
     {BACK_FINS.slice(0, -1).map(([x, y, h, w, lean], i) => {
@@ -165,6 +181,7 @@ const BackFins: React.FC = () => (
           out={s * 0.32}
           c={PALETTE.finDark}
           t={0.18}
+          s={0.91 - i * 0.08}
         />
       ));
     })}
@@ -256,6 +273,7 @@ const TailSegment: React.FC<{ i: number; sway: number[]; lift: number }> = ({ i,
           w={fs * 0.62}
           lean={0.42}
           t={0.22}
+          s={0.08 + (4 - i) * 0.1 + (j ? -0.03 : 0.03)}
         />
       ))}
       {/* 左右の列（中央列の間に互い違い） */}
@@ -269,6 +287,7 @@ const TailSegment: React.FC<{ i: number; sway: number[]; lift: number }> = ({ i,
           out={s * 0.3}
           c={PALETTE.finDark}
           t={0.18}
+          s={0.08 + (4 - i) * 0.1}
         />
       ))}
       <TailSegment i={i + 1} sway={sway} lift={lift} />
@@ -277,8 +296,9 @@ const TailSegment: React.FC<{ i: number; sway: number[]; lift: number }> = ({ i,
 };
 
 // ---- 頭：吻が前に出て下顎とつながる ----
-const Head: React.FC<{ pitch: number; jaw: number }> = ({ pitch, jaw }) => (
+const Head: React.FC<{ pitch: number; jaw: number; extra?: React.ReactNode }> = ({ pitch, jaw, extra }) => (
   <Joint at={[0.55, 10.0, 0]} r={[0, 0, pitch]}>
+    {extra}
     {/* 首 */}
     <T p={[0.45, 10.25, 0]} s={[1.7, 1.15, 1.75]} c={PALETTE.skinDark} neg={[1, 1]} pos={[0.82, 0.85]} shift={0.08} />
     {/* 頭蓋：前に向けて低く細く */}
@@ -286,7 +306,7 @@ const Head: React.FC<{ pitch: number; jaw: number }> = ({ pitch, jaw }) => (
     {/* 眉の張り出し：前に向けて傾斜 */}
     <T p={[1.55, 11.62, 0]} s={[1.5, 0.36, 1.6]} c={PALETTE.skinDark} axis="x" neg={[0.8, 0.9]} pos={[0.6, 0.85]} shift={-0.28} />
     {/* 後頭部の小さなひれ */}
-    <Fin base={[0.6, 11.55, 0]} h={0.7} w={0.55} lean={0.5} c={PALETTE.finDark} t={0.18} />
+    <Fin base={[0.6, 11.55, 0]} h={0.7} w={0.55} lean={0.5} c={PALETTE.finDark} t={0.18} s={1} />
     {[-1, 1].map((s) => (
       <React.Fragment key={s}>
         <T p={[1.98, 11.08, s * 0.76]} s={[0.55, 0.2, 0.06]} c={PALETTE.eye} axis="x" pos={[0.7, 1]} shift={-0.15} />
@@ -317,7 +337,8 @@ const Head: React.FC<{ pitch: number; jaw: number }> = ({ pitch, jaw }) => (
   </Joint>
 );
 
-export const KaijuModelV2: React.FC<{ pose: KaijuPose }> = ({ pose }) => (
+/** headExtra は頭の関節の中（頭と一緒に動く座標系）に置く。v4 の熱線用 */
+export const KaijuModelV2: React.FC<{ pose: KaijuPose; headExtra?: React.ReactNode }> = ({ pose, headExtra }) => (
   <group position={[0, pose.bob, 0]}>
     <Leg s={1} hip={pose.hipL} knee={pose.kneeL} />
     <Leg s={-1} hip={pose.hipR} knee={pose.kneeR} />
@@ -333,7 +354,7 @@ export const KaijuModelV2: React.FC<{ pose: KaijuPose }> = ({ pose }) => (
       <BackFins />
       <Arm s={1} shoulder={pose.shoulderL} elbow={pose.elbow} />
       <Arm s={-1} shoulder={pose.shoulderR} elbow={pose.elbow} />
-      <Head pitch={pose.headPitch} jaw={pose.jaw} />
+      <Head pitch={pose.headPitch} jaw={pose.jaw} extra={headExtra} />
     </Joint>
   </group>
 );
