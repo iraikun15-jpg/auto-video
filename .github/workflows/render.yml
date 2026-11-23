@@ -39,8 +39,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Render video
-        run: npm run render
+      - name: Render episode 2
+        run: |
+          npm run render
+          cp out/ep2/ep2_full.mp4 out/video.mp4
+          cat out/ep2/ep2_timing.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish to GitHub Releases
         env:
@@ -49,10 +52,10 @@ jobs:
           TAG="video-${{ github.run_number }}"
           SHORT_SHA="${GITHUB_SHA::7}"
           gh release create "$TAG" \
-            out/video.mp4 \
+            out/video.mp4 out/ep2/* \
             --target "$GITHUB_SHA" \
             --title "動画 #${{ github.run_number }} (${GITHUB_REF_NAME} @ ${SHORT_SHA})" \
-            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした 1080x1920 MP4 です。" \
+            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした第2話（無音）です。video.mp4 と ep2_full.mp4 は同じ結合版、ep2_seg1〜5 はセグメント別、ep2_timing.md はタイミング表です。" \
             --latest
 
       - name: Upload to Google Drive

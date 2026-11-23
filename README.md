@@ -6,15 +6,23 @@
 
 | ファイル | 役割 |
 | --- | --- |
-| `src/ShortVideo.tsx` | 動画の中身（テキストやアニメーション）。主にここを編集します |
-| `src/Root.tsx` | 動画サイズ・fps・長さ・表示テキストの設定 |
+| `src/rig/` | シリーズ共通の部品（棒人間リグ・上司・デスク・椅子・プリンター等） |
+| `src/ep2/` | 第2話（seg1〜seg5、サムネイル、`timing.json` に各セグメントの尺） |
+| `scripts/render-ep2.mjs` | 第2話の納品物一式を `out/ep2/` に書き出す |
+| `src/ShortVideo.tsx` | 最初のサンプル動画 |
+| `src/Root.tsx` | コンポジションの登録 |
 | `src/index.ts` | Remotion のエントリーポイント |
 | `.github/workflows/render.yml` | 自動レンダリング＆Releases公開のワークフロー |
 
 ## 自動レンダリング
 
-リポジトリに push すると GitHub Actions が動画をレンダリングし、
-[Releases](../../releases) に `video.mp4` を添付して公開します。
+リポジトリに push すると GitHub Actions が第2話をレンダリングし、
+[Releases](../../releases) に次のファイルを添付して公開します（すべて無音）。
+
+- `video.mp4` / `ep2_full.mp4`：結合版（同じもの）
+- `ep2_seg1.mp4`〜`ep2_seg5.mp4`：セグメント別
+- `ep2_thumbnail.png`：サムネイル
+- `ep2_timing.md`：各セグメントの実尺
 
 最新の動画は常に次のURLからダウンロードできます：
 
@@ -44,5 +52,5 @@ GitHub の Secrets に次の4つを登録すると、レンダリング後に指
 ```bash
 npm install
 npm run dev     # ブラウザでプレビュー（Remotion Studio）
-npm run render  # out/video.mp4 に書き出し
+npm run render  # 第2話の納品物を out/ep2/ に書き出し
 ```

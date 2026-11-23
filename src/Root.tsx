@@ -1,20 +1,48 @@
-import { Composition } from "remotion";
+import { Composition, Still } from "remotion";
 import { ShortVideo } from "./ShortVideo";
+import { Ep2, Ep2Segments, EP2_TOTAL_FRAMES } from "./ep2/Ep2";
+import { Ep2Thumbnail } from "./ep2/Thumbnail";
+import { FPS } from "./ep2/common";
 
 export const RemotionRoot: React.FC = () => {
   return (
-    <Composition
-      id="ShortVideo"
-      component={ShortVideo}
-      // スマホ向け縦型（9:16）
-      width={1080}
-      height={1920}
-      fps={30}
-      durationInFrames={150} // 5秒
-      defaultProps={{
-        title: "こんにちは！",
-        subtitle: "Remotionで作った\n縦型ショート動画",
-      }}
-    />
+    <>
+      {/* 第2話：結合版（無音） */}
+      <Composition
+        id="Ep2"
+        component={Ep2}
+        width={1080}
+        height={1920}
+        fps={FPS}
+        durationInFrames={EP2_TOTAL_FRAMES}
+      />
+      {/* 第2話：セグメント別（無音・音声同期用） */}
+      {Ep2Segments.map((s) => (
+        <Composition
+          key={s.id}
+          id={`Ep2-${s.id}`}
+          component={s.component}
+          width={1080}
+          height={1920}
+          fps={FPS}
+          durationInFrames={s.frames}
+        />
+      ))}
+      <Still id="Ep2Thumbnail" component={Ep2Thumbnail} width={1080} height={1920} />
+
+      {/* 最初に作ったサンプル */}
+      <Composition
+        id="ShortVideo"
+        component={ShortVideo}
+        width={1080}
+        height={1920}
+        fps={30}
+        durationInFrames={150}
+        defaultProps={{
+          title: "こんにちは！",
+          subtitle: "Remotionで作った\n縦型ショート動画",
+        }}
+      />
+    </>
   );
 };
