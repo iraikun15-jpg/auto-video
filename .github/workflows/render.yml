@@ -1,0 +1,50 @@
+name: Render video
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write # Releaseの作成に必要
+
+concurrency:
+  group: render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Japanese fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Render video
+        run: npm run render
+
+      - name: Publish to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="video-${{ github.run_number }}"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          gh release create "$TAG" \
+            out/video.mp4 \
+            --target "$GITHUB_SHA" \
+            --title "動画 #${{ github.run_number }} (${GITHUB_REF_NAME} @ ${SHORT_SHA})" \
+            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした 1080x1920 MP4 です。" \
+            --latest
