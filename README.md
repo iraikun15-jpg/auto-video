@@ -24,6 +24,21 @@ https://github.com/<オーナー>/<リポジトリ>/releases/latest/download/vid
 
 Actions タブの「Render video」→「Run workflow」から手動でも実行できます。
 
+## Google Drive への自動アップロード
+
+GitHub の Secrets に次の4つを登録すると、レンダリング後に指定フォルダへ
+`video-<実行番号>-<コミット>.mp4` という名前でアップロードされます（未登録ならスキップ）。
+
+| Secret 名 | 内容 |
+| --- | --- |
+| `GDRIVE_CLIENT_ID` | Google Cloud の OAuth クライアント ID |
+| `GDRIVE_CLIENT_SECRET` | 同 クライアント シークレット |
+| `GDRIVE_REFRESH_TOKEN` | OAuth 2.0 Playground で取得したリフレッシュトークン |
+| `GDRIVE_FOLDER_ID` | アップロード先フォルダのURL末尾のID |
+
+※ 個人の Google アカウントのマイドライブには、サービスアカウントからはアップロードできない
+（容量を持たないため）ので、OAuth のリフレッシュトークン方式を使っています。
+
 ## ローカルで使う場合
 
 ```bash
