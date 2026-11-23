@@ -39,7 +39,7 @@ const build = () => {
   const r0 = rootAt(640);
   const towerX = tp.x - (tp.x - r0.x) * 0.06;
   const towerZ = tp.z;
-  add({ x: towerX, z: towerZ, w: 2.6, d: 2.6, h: 19, tone: 0, variant: 0, roof: false, tower: true });
+  add({ x: towerX, z: towerZ, w: 7.5, d: 7.5, h: 25, tone: 0, variant: 0, roof: false, tower: true });
 
   // 怪獣の通り道（|z| が小さい帯）に低めのビルを並べる（踏み潰し用）
   for (let x = -21; x < 6; x += 4.6) {
@@ -78,7 +78,7 @@ const build = () => {
         // カメラ側（z>5）は空けて、怪獣が手前のビルに隠れないようにする
         if (cz > 5) return;
         if (Math.abs(cz) < 4.8 && cx > -24 && cx < 14) return;
-        if (Math.hypot(cx - towerX, cz - towerZ) < 5) return;
+        if (Math.hypot(cx - towerX, cz - towerZ) < 7.5) return;
         if (R(`skip${k2}`) < 0.08) return;
         const downtown = Math.max(0, 1 - Math.hypot(cx - 26, cz + 24) / 26);
         const far = cz < -30 ? 1.4 : 1;
@@ -163,7 +163,7 @@ export const COLLAPSES: { f: number; kind: "crush" | "topple" | "cut"; x: number
       const reach = Math.max(b.w, b.d) / 2 + 1.6;
       if (dist < reach && b.cutF === undefined && b.crushF === undefined && b.toppleF === undefined) {
         b.cutF = f;
-        b.cutH = b.tower ? 0.42 : 0.3 + random(`cut${b.id}`) * 0.25;
+        b.cutH = b.tower ? 0.33 : 0.3 + random(`cut${b.id}`) * 0.25;
         b.burnF = f;
       } else if (dist < reach + 4.5 && b.burnF === undefined) {
         b.burnF = f + 6 + Math.floor(random(`ign${b.id}`) * 24);

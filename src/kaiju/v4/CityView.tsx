@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { Easing, interpolate, random } from "remotion";
 import { Building, BUILDINGS } from "./city";
 import { Flame, SmokeColumn } from "./effects";
+import { TokyoTower } from "./Tower";
 
 /** 窓明かりのテクスチャ（夜景）。1枚で 4×4 ユニット、8×8 の窓 */
 const windowTex = (() => {
@@ -62,8 +63,8 @@ const buildingGeo = (w: number, h: number, d: number) => {
   return g;
 };
 
-const BASE_A = new THREE.Color("#3d4456");
-const BASE_B = new THREE.Color("#5d6478");
+const BASE_A = new THREE.Color("#6d7386");
+const BASE_B = new THREE.Color("#9aa0ae");
 const CHAR = new THREE.Color("#1b1716");
 const FIRE = new THREE.Color("#ff6a20");
 
@@ -92,7 +93,7 @@ const useBuildingMaterial = (b: Building, f: number) => {
     m.emissiveIntensity = (1.4 - char * 0.5) * fl;
   } else {
     m.emissive.set("#ffffff");
-    m.emissiveIntensity = destroyed ? 0 : 0.95;
+    m.emissiveIntensity = destroyed ? 0 : 0.55;
   }
   return m;
 };
@@ -160,100 +161,15 @@ const BuildingMesh: React.FC<{ b: Building; f: number }> = ({ b, f }) => {
   );
 };
 
-/** 赤い塔（様式化したランドマーク）。熱線で上部が切り落とされる */
-const TowerMesh: React.FC<{ b: Building; f: number }> = ({ b, f }) => {
-  const red = useMemo(() => new THREE.MeshStandardMaterial({ color: "#d8432c", flatShading: true, roughness: 0.6, emissive: "#5a0d04", emissiveIntensity: 0.6 }), []);
-  const white = useMemo(() => new THREE.MeshStandardMaterial({ color: "#e8e2da", flatShading: true, roughness: 0.6, emissive: "#3a3a3a", emissiveIntensity: 0.5 }), []);
-  const H = b.h;
-  const cut = b.cutF !== undefined && f >= b.cutF ? H * (b.cutH ?? 0.42) : Infinity;
-  const char = b.cutF !== undefined && f >= b.cutF ? Math.min(1, (f - b.cutF) / 80) : 0;
-  red.color.set("#d8432c").lerp(new THREE.Color("#2a1410"), char * 0.7);
-  const width = (y: number) => 2.6 * (1 - (y / H) * 0.85);
-  const parts: { y0: number; y1: number; node: (key: string) => React.ReactNode }[] = [];
-  // 脚（4本、上に向かって内側へ）
-  const legSegs = 8;
-  for (let i = 0; i < legSegs; i++) {
-    const y0 = (i / legSegs) * H * 0.92;
-    const y1 = ((i + 1) / legSegs) * H * 0.92;
-    const mat = i % 2 ? white : red;
-    for (const [sx, sz] of [
-      [1, 1],
-      [1, -1],
-      [-1, 1],
-      [-1, -1],
-    ]) {
-      const a: [number, number, number] = [(sx * width(y0)) / 2, y0, (sz * width(y0)) / 2];
-      const c: [number, number, number] = [(sx * width(y1)) / 2, y1, (sz * width(y1)) / 2];
-      const len = Math.hypot(c[0] - a[0], c[1] - a[1], c[2] - a[2]);
-      const mid: [number, number, number] = [(a[0] + c[0]) / 2, (a[1] + c[1]) / 2, (a[2] + c[2]) / 2];
-      const tilt = Math.atan2(Math.hypot(c[0] - a[0], c[2] - a[2]), c[1] - a[1]);
-      parts.push({
-        y0,
-        y1,
-        node: (k) => (
-          <mesh key={k} position={mid} material={mat} rotation={[sz * tilt * 0.7, 0, -sx * tilt * 0.7]} castShadow>
-            <boxGeometry args={[0.22, len, 0.22]} />
-          </mesh>
-        ),
-      });
-    }
-    // 水平の梁
-    parts.push({
-      y0: y1,
-      y1,
-      node: (k) => (
-        <mesh key={k} position={[0, y1, 0]} material={i % 2 ? red : white} castShadow>
-          <boxGeometry args={[width(y1) + 0.2, 0.16, width(y1) + 0.2]} />
-        </mesh>
-      ),
-    });
-  }
-  // 展望台2つとアンテナ
-  for (const [y, s] of [
-    [H * 0.36, 1.5],
-    [H * 0.62, 0.9],
-  ] as const) {
-    parts.push({
-      y0: y,
-      y1: y,
-      node: (k) => (
-        <mesh key={k} position={[0, y, 0]} material={white} castShadow>
-          <boxGeometry args={[width(y) * s, 0.7, width(y) * s]} />
-        </mesh>
-      ),
-    });
-  }
-  parts.push({
-    y0: H * 0.92,
-    y1: H,
-    node: (k) => (
-      <mesh key={k} position={[0, H * 0.96, 0]} material={red} castShadow>
-        <cylinderGeometry args={[0.05, 0.14, H * 0.12, 5]} />
-      </mesh>
-    ),
-  });
-
-  const lower = parts.filter((p) => p.y1 <= cut);
-  const upper = parts.filter((p) => p.y1 > cut);
-  const t = b.cutF !== undefined ? interpolate(f - b.cutF, [4, 44], [0, 1], { ...clamp, easing: Easing.in(Easing.quad) }) : 0;
-  return (
-    <group position={[b.x, 0, b.z]}>
-      {lower.map((p, i) => p.node(`l${i}`))}
-      {cut < Infinity ? (
-        <group position={[0, cut - t * cut * 0.55, 0]} rotation={[0.25 * t, 0, 1.25 * t]}>
-          <group position={[0, -cut, 0]}>{upper.map((p, i) => p.node(`u${i}`))}</group>
-        </group>
-      ) : (
-        upper.map((p, i) => p.node(`u${i}`))
-      )}
-      {cut < Infinity ? <Flame x={0} y={cut} z={0} f={f} scale={1.4} seed={99} /> : null}
-    </group>
-  );
-};
-
 export const City: React.FC<{ f: number }> = ({ f }) => (
   <>
-    {BUILDINGS.map((b) => (b.tower ? <TowerMesh key={b.id} b={b} f={f} /> : <BuildingMesh key={b.id} b={b} f={f} />))}
+    {BUILDINGS.map((b) =>
+      b.tower ? (
+        <TokyoTower key={b.id} x={b.x} z={b.z} h={b.h} f={f} cutF={b.cutF} cutH={b.cutH} />
+      ) : (
+        <BuildingMesh key={b.id} b={b} f={f} />
+      ),
+    )}
     {/* 燃えているビルからの煙 */}
     {BUILDINGS.filter((b) => b.burnF !== undefined && f >= b.burnF).map((b) => (
       <SmokeColumn key={`smoke-${b.id}`} x={b.x} y={b.cutF !== undefined ? b.h * (b.cutH ?? 0.4) : b.h} z={b.z} f={f} start={b.burnF!} size={Math.max(b.w, b.d) * 0.5} seed={b.id} puffs={3} />
@@ -264,7 +180,7 @@ export const City: React.FC<{ f: number }> = ({ f }) => (
 /** 遠景のビル群（シルエット＋まばらな窓） */
 export const Skyline: React.FC = () => {
   const mat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: "#1c2030", flatShading: true, emissiveMap: windowTex(1), emissive: "#ffffff", emissiveIntensity: 0.45 }),
+    () => new THREE.MeshStandardMaterial({ color: "#7a7f90", flatShading: true, emissiveMap: windowTex(1), emissive: "#ffffff", emissiveIntensity: 0.3 }),
     [],
   );
   return (

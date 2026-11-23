@@ -62,7 +62,7 @@ const smokeMat = (o: number) => {
   const k = Math.round(o * 20);
   let m = smokeMats.get(k);
   if (!m) {
-    m = new THREE.MeshStandardMaterial({ color: "#2a2422", transparent: true, opacity: k / 20, flatShading: true, depthWrite: false, roughness: 1 });
+    m = new THREE.MeshStandardMaterial({ color: "#5a4c48", transparent: true, opacity: k / 20, flatShading: true, depthWrite: false, roughness: 1 });
     smokeMats.set(k, m);
   }
   return m;
@@ -89,8 +89,8 @@ export const SmokeColumn: React.FC<{ x: number; y: number; z: number; f: number;
         const t = ((age + (i * PERIOD) / puffs + seed * 13) % PERIOD) / PERIOD;
         const born = age - t * PERIOD;
         if (born < 0) return null;
-        const r = size * (0.7 + t * 2.2) * grow;
-        const op = 0.55 * Math.sin(Math.PI * Math.min(1, t * 1.4)) * (1 - t * 0.4);
+        const r = size * (0.5 + t * 1.6) * grow;
+        const op = 0.38 * Math.sin(Math.PI * Math.min(1, t * 1.4)) * (1 - t * 0.4);
         return (
           <mesh
             key={i}

@@ -22,12 +22,12 @@ const CAM_KEYS: [number, Cam][] = [
   [440, { p: [15, 4.5, 38], l: [3, 8.5, 0], fov: 42 }],
   [475, { p: [-15, 10, 30], l: [-1, 9, 0], fov: 42 }], // 背びれのチャージ
   [528, { p: [-13, 10, 31], l: [0, 9, 0], fov: 42 }],
-  [552, { p: [4, 14, 50], l: [16, 4, -6], fov: 44 }], // 熱線のなぎ払い
-  [722, { p: [6, 13, 50], l: [15, 4, -4], fov: 44 }],
+  [552, { p: [-3, 13, 56], l: [10, 6, -6], fov: 46 }], // 熱線のなぎ払い（怪獣・熱線・塔を一画面に）
+  [722, { p: [-1, 12.5, 56], l: [10, 6, -5], fov: 46 }],
   [762, { p: [17, 5, 40], l: [3, 8.5, 0], fov: 42 }],
   [870, { p: [16, 5, 40], l: [3, 8.5, 0], fov: 42 }],
-  [892, { p: [8, 10, 46], l: [14, 5, -4], fov: 44 }], // 短い熱線
-  [990, { p: [9, 10, 46], l: [13, 5, -4], fov: 44 }],
+  [892, { p: [0, 11, 52], l: [10, 6, -4], fov: 46 }], // 短い熱線
+  [990, { p: [1, 11, 52], l: [10, 6, -4], fov: 46 }],
   [1024, { p: [16, 5, 40], l: [3, 8.5, 0], fov: 42 }],
   [1062, { p: [16, 5.5, 42], l: [3, 8.5, 0], fov: 42 }],
   [1170, { p: [12, 15, 84], l: [3, 9, -10], fov: 40 }], // 引いて締め
@@ -73,11 +73,11 @@ const groundTex = (() => {
       const c = document.createElement("canvas");
       c.width = c.height = 190;
       const g = c.getContext("2d")!;
-      g.fillStyle = "#14161d";
+      g.fillStyle = "#3a3c44";
       g.fillRect(0, 0, 190, 190);
-      g.fillStyle = "#23262f";
+      g.fillStyle = "#5a5c64";
       g.fillRect(0, 0, 140, 140); // 街区（7/9.5）
-      g.fillStyle = "#4a4436";
+      g.fillStyle = "#c8b060";
       for (let i = 0; i < 190; i += 16) g.fillRect(162, i, 3, 8); // 中央線
       t = new THREE.CanvasTexture(c);
       t.wrapS = t.wrapT = THREE.RepeatWrapping;
@@ -105,7 +105,7 @@ const Ground: React.FC = () => {
       {/* 海：簡単な平面＋夕空を映したような色 */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-94, 0.05, -30]} receiveShadow>
         <planeGeometry args={[140, 180]} />
-        <meshStandardMaterial color="#1a2c48" roughness={0.25} metalness={0.4} emissive="#2a1c30" emissiveIntensity={0.6} />
+        <meshStandardMaterial color="#4a6a96" roughness={0.2} metalness={0.35} emissive="#a06050" emissiveIntensity={0.45} />
       </mesh>
       {/* 岸壁 */}
       <mesh position={[-24.2, -0.4, -30]}>
@@ -176,7 +176,7 @@ const Scene: React.FC<{ f: number }> = ({ f }) => {
   const pose = poseAt(f);
   const glow = finGlow(f);
   const fire = interpolate(f, [540, 760, 1100], [0, 0.6, 1], clamp);
-  const fogColor = new THREE.Color("#2b2236").lerp(new THREE.Color("#3a1912"), fire);
+  const fogColor = new THREE.Color("#e0a088").lerp(new THREE.Color("#b0503a"), fire);
 
   // 燃えている場所（火の粉と炎の照り返し用）
   const sources = [
@@ -194,15 +194,15 @@ const Scene: React.FC<{ f: number }> = ({ f }) => {
   return (
     <>
       <CameraRig f={f} />
-      <fog attach="fog" args={[fogColor, 45, 190]} />
-      <hemisphereLight args={["#5a5a8c", "#1a1210", 0.75]} />
-      {/* 主光源：夕日の残光（後ろ左から低く）。怪獣の周りに影を落とす */}
+      <fog attach="fog" args={[fogColor, 60, 230]} />
+      <hemisphereLight args={["#b8c4f0", "#6a4a3a", 1.5]} />
+      {/* 主光源：夕日（左手前から低く）。怪獣の周りに影を落とす */}
       <primitive object={target} />
       <directionalLight
-        position={[root.x - 30, 22, -26]}
+        position={[root.x - 34, 20, 26]}
         target={target}
-        color="#ffb08a"
-        intensity={1.5}
+        color="#ffbb88"
+        intensity={3.2}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -214,7 +214,7 @@ const Scene: React.FC<{ f: number }> = ({ f }) => {
         shadow-bias={-0.0006}
       />
       {/* 正面からの弱い補助光（怪獣の顔が真っ黒にならないように） */}
-      <directionalLight position={[root.x + 20, 14, 40]} color="#8a93c8" intensity={0.95} />
+      <directionalLight position={[root.x + 24, 16, 34]} color="#c8b8e8" intensity={0.9} />
       {/* 炎の照り返し */}
       <pointLight color="#ff6a2a" position={[fireCenter.x, 6, fireCenter.z]} intensity={Math.min(1, sources.length / 12) * 220} distance={70} decay={1.5} />
 
@@ -265,8 +265,8 @@ export const KaijuV4: React.FC<{ withAudio?: boolean }> = ({ withAudio = true })
   return (
     <AbsoluteFill
       style={{
-        // 夕景→夜。下（地平線）ほど夕焼けが残る
-        background: `linear-gradient(#070a1a 0%, #1b1a3a 38%, ${fire > 0.3 ? "#6a2418" : "#7a3a4a"} 72%, #d06a3a 100%)`,
+        // 夕焼け空。上は青紫、地平線に向かって橙
+        background: `linear-gradient(#3a4a86 0%, #8a6a9a 30%, ${fire > 0.3 ? "#e0603a" : "#f08a6a"} 58%, #ffc080 78%, #ffd8a0 100%)`,
       }}
     >
       <ThreeCanvas width={width} height={height} shadows gl={{ alpha: true, antialias: true }} camera={{ fov: 40, position: [0, 10, 60] }}>
@@ -277,7 +277,7 @@ export const KaijuV4: React.FC<{ withAudio?: boolean }> = ({ withAudio = true })
       <AbsoluteFill style={{ background: "#b4200a", mixBlendMode: "multiply", opacity: fire * 0.35 }} />
       {/* 熱線の青白い光と爆発の閃光 */}
       <AbsoluteFill style={{ background: "#9fdcff", mixBlendMode: "screen", opacity: beam * 0.08 + flash }} />
-      <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%)" }} />
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(20,10,20,0.4) 100%)" }} />
       {withAudio ? <Audio src={staticFile("kaiju_v4.wav")} /> : null}
     </AbsoluteFill>
   );
