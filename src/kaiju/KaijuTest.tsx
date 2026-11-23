@@ -53,11 +53,9 @@ const poseAt = (f: number): { pose: KaijuPose; turn: number } => {
   return { pose, turn };
 };
 
-export const KaijuTest: React.FC = () => {
-  const frame = useCurrentFrame();
+/** v1/v2 共通の舞台（カメラ距離・背景・ライト・地面を揃えて比較できるように） */
+export const KaijuStage: React.FC<{ turn: number; children: React.ReactNode }> = ({ turn, children }) => {
   const { width, height } = useVideoConfig();
-  const { pose, turn } = poseAt(frame);
-
   return (
     <AbsoluteFill
       style={{
@@ -94,11 +92,19 @@ export const KaijuTest: React.FC = () => {
         </mesh>
         {/* 胴体の少し後ろ(x=-2.5)を回転軸に。初期は斜め前向き */}
         <group rotation={[0, -1.0 + turn, 0]}>
-          <group position={[2.5, 0, 0]}>
-            <KaijuModel pose={pose} />
-          </group>
+          <group position={[2.5, 0, 0]}>{children}</group>
         </group>
       </ThreeCanvas>
     </AbsoluteFill>
+  );
+};
+
+export const KaijuTest: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { pose, turn } = poseAt(frame);
+  return (
+    <KaijuStage turn={turn}>
+      <KaijuModel pose={pose} />
+    </KaijuStage>
   );
 };

@@ -4,6 +4,7 @@ import { Ep2, Ep2Segments, EP2_TOTAL_FRAMES } from "./ep2/Ep2";
 import { Ep2Thumbnail } from "./ep2/Thumbnail";
 import { FPS } from "./ep2/common";
 import { KaijuTest, KAIJU_FRAMES } from "./kaiju/KaijuTest";
+import { KaijuTestV2, KAIJU_V2_FRAMES } from "./kaiju/KaijuTestV2";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -39,6 +40,15 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
         fps={30}
         durationInFrames={KAIJU_FRAMES}
+      />
+
+      <Composition
+        id="KaijuTestV2"
+        component={KaijuTestV2}
+        width={1080}
+        height={1920}
+        fps={30}
+        durationInFrames={KAIJU_V2_FRAMES}
       />
 
       {/* 最初に作ったサンプル */}
