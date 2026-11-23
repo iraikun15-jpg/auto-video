@@ -1,0 +1,27 @@
+{
+  "name": "auto-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotionで縦型ショート動画（1080x1920 MP4）を作るプロジェクト",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "node scripts/render-ep2.mjs",
+    "render:sample": "remotion render src/index.ts ShortVideo out/video.mp4 --codec=h264",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-three/fiber": "8.18.0",
+    "@remotion/cli": "4.0.546",
+    "@remotion/google-fonts": "4.0.546",
+    "@remotion/three": "4.0.546",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.546",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "@types/three": "0.170.0",
+    "typescript": "5.6.3"
+  }
+}

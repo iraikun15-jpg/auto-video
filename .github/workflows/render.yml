@@ -1,0 +1,82 @@
+name: Render video
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write # Releaseの作成に必要
+
+concurrency:
+  group: render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      # Google Drive アップロード用（未登録なら空になり、アップロードはスキップ）
+      GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
+      GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
+      GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
+      GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Japanese fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Render episode 2
+        run: |
+          npm run render
+          cp out/ep2/ep2_full.mp4 out/video.mp4
+          cat out/ep2/ep2_timing.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render low-poly 3D test
+        run: |
+          START=$(date +%s)
+          npx remotion render src/index.ts KaijuTest out/kaiju_test.mp4 --codec=h264 --muted --gl=swangle --log=warn
+          echo "### ローポリ3Dテスト v1: レンダリング $(( $(date +%s) - START )) 秒（270フレーム）" >> "$GITHUB_STEP_SUMMARY"
+          START=$(date +%s)
+          npx remotion render src/index.ts KaijuTestV2 out/kaiju_test_v2.mp4 --codec=h264 --muted --gl=swangle --log=warn
+          echo "### ローポリ3Dテスト v2: レンダリング $(( $(date +%s) - START )) 秒（270フレーム）" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render kaiju v4 (city destruction, with synthesized audio)
+        run: |
+          node scripts/synth-kaiju-v4.mjs
+          START=$(date +%s)
+          npx remotion render src/index.ts KaijuV4 out/kaiju_v4.mp4 --codec=h264 --gl=swangle --log=warn
+          echo "### 本編テスト v4: レンダリング $(( $(date +%s) - START )) 秒（1200フレーム）" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="video-${{ github.run_number }}"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          gh release create "$TAG" \
+            out/video.mp4 out/ep2/* out/kaiju_test.mp4 out/kaiju_test_v2.mp4 out/kaiju_v4.mp4 \
+            --target "$GITHUB_SHA" \
+            --title "動画 #${{ github.run_number }} (${GITHUB_REF_NAME} @ ${SHORT_SHA})" \
+            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした第2話（無音）です。video.mp4 と ep2_full.mp4 は同じ結合版、ep2_seg1〜5 はセグメント別、ep2_timing.md はタイミング表、kaiju_test.mp4 / kaiju_test_v2.mp4 はローポリ3Dテスト（v1/v2）、kaiju_v4.mp4 は本編テスト v4（東京破壊・音あり）です。" \
+            --latest
+
+      - name: Upload to Google Drive
+        # Secretsが未登録のあいだはこのステップをスキップします
+        if: ${{ env.GDRIVE_REFRESH_TOKEN != '' }}
+        run: |
+          node scripts/upload-to-drive.mjs out/video.mp4 \
+            "video-${{ github.run_number }}-${GITHUB_SHA::7}.mp4"
