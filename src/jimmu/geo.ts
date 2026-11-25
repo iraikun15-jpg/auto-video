@@ -39,7 +39,30 @@ export const HONSHU: LL[] = [
   [131.5, 34.02], [131.05, 33.93],
 ];
 
-export const LANDS = [HONSHU, KYUSHU, SHIKOKU, AWAJI];
+/**
+ * 海岸線に細かいギザギザを足す（切り絵の切り口）。
+ * 経度緯度の上で一度だけ決めるので、フレームごとに形が揺れない。
+ */
+const roughen = (pts: LL[], seed: number, step = 0.04, amp = 0.009): LL[] => {
+  const out: LL[] = [];
+  let k = seed * 1000;
+  const rnd = () => {
+    k = (k * 9301 + 49297) % 233280;
+    return k / 233280 - 0.5;
+  };
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    const n = Math.max(1, Math.round(Math.hypot(b[0] - a[0], b[1] - a[1]) / step));
+    for (let j = 0; j < n; j++) {
+      const t = j / n;
+      out.push([a[0] + (b[0] - a[0]) * t + (j ? rnd() * amp * 2 : 0), a[1] + (b[1] - a[1]) * t + (j ? rnd() * amp * 2 : 0)]);
+    }
+  }
+  return out;
+};
+
+export const LANDS = [HONSHU, KYUSHU, SHIKOKU, AWAJI].map((l, i) => roughen(l, i + 1));
 
 // 地名
 export const PLACES = {

@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Easing, interpolate, random } from "remotion";
+import { AbsoluteFill, Easing, Img, interpolate, random, staticFile } from "remotion";
 import { Cam, LANDS, LL, partial, polyPath, project } from "./geo";
 import { AI, AI_LIGHT, H, KIN, MINCHO, PAPER, PAPER_BG, SANS, SHU, SUMI, W } from "./theme";
 
@@ -17,29 +17,17 @@ export const sway = (f: number, seed: number, amp = 1.2, speed = 0.06) =>
 // ---------- 画面とフィルタ ----------
 /**
  * 切り絵用の共通フィルタ
- *  - paper: 切り口のガタつき＋落ち影（紙が1枚浮いて見える）
- *  - paperLow: 落ち影を浅くしたもの（小さい部品用）
- *  - washi: 和紙の繊維ノイズ
+ *  - paper: 落ち影（紙が1枚浮いて見える）
+ *  - paperLow: 浅い落ち影（小さい部品用）
  */
 const Defs: React.FC<{ f: number }> = ({ f }) => (
   <defs>
+    {/* 紙が1枚浮いて見える落ち影（ノイズ系フィルタは描画が崩れるので使わない） */}
     <filter id="paper" x="-20%" y="-20%" width="140%" height="140%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="n" />
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" result="d" />
-      <feDropShadow in="d" dx="5" dy="9" stdDeviation="5" floodColor="#3a2a14" floodOpacity="0.38" />
+      <feDropShadow dx="5" dy="9" stdDeviation="5" floodColor="#3a2a14" floodOpacity="0.38" />
     </filter>
     <filter id="paperLow" x="-30%" y="-30%" width="160%" height="160%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="5" result="n" />
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G" result="d" />
-      <feDropShadow in="d" dx="3" dy="5" stdDeviation="3" floodColor="#3a2a14" floodOpacity="0.35" />
-    </filter>
-    <filter id="washi" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.55 0.06" numOctaves="3" seed="11" />
-      <feColorMatrix values="0 0 0 0 0.35  0 0 0 0 0.27  0 0 0 0 0.15  0 0 0 0.9 -0.32" />
-    </filter>
-    <filter id="washiSpots" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="2" />
-      <feColorMatrix values="0 0 0 0 0.45  0 0 0 0 0.33  0 0 0 0 0.16  0 0 0 0.55 -0.12" />
+      <feDropShadow dx="3" dy="5" stdDeviation="3" floodColor="#3a2a14" floodOpacity="0.35" />
     </filter>
     {/* 海の青海波もよう */}
     <pattern id="seigaiha" width="64" height="32" patternUnits="userSpaceOnUse" patternTransform={`translate(${(f * 0.8) % 64},${Math.sin(f * 0.05) * 4})`}>
@@ -55,7 +43,7 @@ const Defs: React.FC<{ f: number }> = ({ f }) => (
   </defs>
 );
 
-/** 台紙（和紙）＋SVGキャンバス。children は SVG 要素 */
+/** 台紙（和紙の画像）＋SVGキャンバス＋いちばん上に和紙の繊維。children は SVG 要素 */
 export const Stage: React.FC<{
   children: React.ReactNode;
   tint?: string;
@@ -64,13 +52,14 @@ export const Stage: React.FC<{
   peel?: boolean; // 冒頭で前の紙がめくれて剥がれる
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true }) => (
   <AbsoluteFill style={{ backgroundColor: PAPER_BG }}>
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
+    <Img src={staticFile("jimmu/washi_bg.jpg")} style={{ position: "absolute", width: W, height: H }} />
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute" }}>
       <Defs f={f} />
-      <rect width={W} height={H} fill={PAPER_BG} />
-      <rect width={W} height={H} filter="url(#washiSpots)" opacity={0.5} />
       {children}
-      {tint ? <rect width={W} height={H} fill={tint} opacity={tintOpacity} style={{ mixBlendMode: "multiply" }} /> : null}
-      <rect width={W} height={H} filter="url(#washi)" opacity={0.4} />
+    </svg>
+    {tint ? <AbsoluteFill style={{ backgroundColor: tint, opacity: tintOpacity, mixBlendMode: "multiply" }} /> : null}
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute" }}>
+      <Defs f={f} />
       {/* 四隅を少し暗く（古い紙の焼け） */}
       <radialGradient id="vignette" cx="50%" cy="48%" r="75%">
         <stop offset="60%" stopColor="#000" stopOpacity={0} />
@@ -80,6 +69,7 @@ export const Stage: React.FC<{
       <Flecks f={f} />
       {peel ? <PeelIn f={f} /> : null}
     </svg>
+    <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: 0.6 }} />
   </AbsoluteFill>
 );
 
@@ -123,7 +113,6 @@ const PeelIn: React.FC<{ f: number }> = ({ f }) => {
       <g filter="url(#paper)">
         <path d={`M-400,-150 ${edge} L-400,${H + 150}Z`} fill={PAPER_BG} />
       </g>
-      <path d={`M-400,-150 ${edge} L-400,${H + 150}Z`} filter="url(#washi)" opacity={0.4} />
     </g>
   );
 };

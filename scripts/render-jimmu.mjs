@@ -14,8 +14,25 @@ const { fps, holdFrames } = timing;
 const remotion = (...args) =>
   execFileSync("npx", ["remotion", ...args], { stdio: "inherit" });
 
+// 同時描画数。切り絵は1フレームの描画が重く、多く並べると描きかけのフレーム（画面の一部が
+// タイル状に並ぶ・人物が欠ける）が混ざるため、少なめに固定する。JIMMU_CONCURRENCY で変更可
+const CONCURRENCY = process.env.JIMMU_CONCURRENCY ?? "1";
 const render = (comp, file) =>
-  remotion("render", "src/index.ts", comp, `${OUT}/${file}`, "--codec=h264", "--muted", "--log=warn");
+  remotion("render", "src/index.ts", comp, `${OUT}/${file}`, "--codec=h264", "--muted", "--log=warn", `--concurrency=${CONCURRENCY}`);
+
+// 壊れたフレームの検出：前後で絵が急に変わったフレームを探す。
+// セグメントの境目（紙めくりを含む前後15フレーム）以外で見つかったら書き出し失敗にする
+const glitchCheck = (file, boundaries) => {
+  // Remotion 同梱の ffmpeg には select フィルタがないので、システムの ffmpeg を使う
+  const log = execFileSync(
+    "ffmpeg",
+    ["-v", "error", "-i", `${OUT}/${file}`, "-vf", "scale=540:960,select=gt(scene\\,0.25),metadata=print:file=-", "-f", "null", "-"],
+    { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
+  );
+  const frames = [...log.matchAll(/pts_time:([0-9.]+)/g)].map((m) => Math.round(Number(m[1]) * fps));
+  const bad = frames.filter((fr) => !boundaries.some((b) => fr >= b - 2 && fr <= b + 15));
+  if (bad.length) throw new Error(`${file}: 絵が急に変わるフレームがあります（壊れている可能性）: ${bad.join(", ")}`);
+};
 
 // 実ファイルからフレーム数・尺・音声トラック有無を読む
 const probe = (file) => {
@@ -52,6 +69,12 @@ for (const s of timing.segments) {
     `| ${s.id} | ${s.label} | ${sec(p.frames)} | ${p.frames} | ${sec(start)} | ${sec(start + p.frames)} | ${sec(start + p.frames - holdFrames)} |`,
   );
   start += p.frames;
+}
+{
+  const bounds = [0];
+  for (const s of timing.segments) bounds.push(bounds[bounds.length - 1] + s.frames);
+  glitchCheck("jimmu_full.mp4", bounds);
+  for (const s of timing.segments) glitchCheck(`jimmu_${s.id}.mp4`, [0]);
 }
 if (full.frames !== start) throw new Error(`結合版: 想定${start}f / 実際${full.frames}f`);
 if (full.hasAudio) throw new Error("結合版に音声トラックが含まれています");
