@@ -15,7 +15,7 @@ export const JimmuThumbnail: React.FC = () => {
     </text>
   );
   return (
-    <Stage>
+    <Stage peel={false}>
       <MapLayer cam={cam} />
       <Route cam={cam} route={ROUTE_EAST} t={1} dashed />
       <PlaceLabel x={hy[0]} y={hy[1]} text="日向" dx={-62} dy={-10} />
