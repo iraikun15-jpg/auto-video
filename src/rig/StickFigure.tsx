@@ -1,6 +1,6 @@
 import React from "react";
 import type { Pose } from "./pose";
-import { BG, BOSS_RED, INK, LINE } from "./theme";
+import { BG, BOSS_RED, FRIEND_BLUE, INK, LINE } from "./theme";
 
 // 体の寸法（第1話の棒人間に合わせた比率）
 export const HEAD_R = 44;
@@ -173,3 +173,45 @@ export const StickFigure: React.FC<StickFigureProps> = ({
 export const Boss: React.FC<Omit<StickFigureProps, "color" | "tie">> = (props) => (
   <StickFigure {...props} color={BOSS_RED} tie />
 );
+
+/** 友達（青の棒人間）。第3話で追加したシリーズ固定キャラ。友達役は以後この姿で統一する */
+export const Friend: React.FC<Omit<StickFigureProps, "color" | "tie">> = (props) => (
+  <StickFigure {...props} color={FRIEND_BLUE} />
+);
+
+/** 顔（笑顔など）。リグ本体には手を入れず、頭の位置に重ねて描く後付け部品 */
+export const Face: React.FC<{
+  pose: Pose;
+  facing?: 1 | -1;
+  scale?: number;
+  color?: string;
+  kind?: "smile" | "flat";
+  opacity?: number;
+}> = ({ pose, facing = 1, scale = 1, color = INK, kind = "smile", opacity = 1 }) => {
+  const j = solve(pose, facing, scale);
+  const [hx, hy] = j.head;
+  const s = scale;
+  const ox = facing * 10 * s; // 顔を向いている側へ少し寄せる
+  const eye = (dx: number) =>
+    kind === "smile"
+      ? `M ${hx + ox + dx - 8 * s} ${hy - 6 * s} Q ${hx + ox + dx} ${hy - 16 * s} ${hx + ox + dx + 8 * s} ${hy - 6 * s}`
+      : `M ${hx + ox + dx - 6 * s} ${hy - 9 * s} L ${hx + ox + dx + 6 * s} ${hy - 9 * s}`;
+  const mouth =
+    kind === "smile"
+      ? `M ${hx + ox - 16 * s} ${hy + 9 * s} Q ${hx + ox} ${hy + 28 * s} ${hx + ox + 16 * s} ${hy + 9 * s}`
+      : `M ${hx + ox - 10 * s} ${hy + 16 * s} L ${hx + ox + 10 * s} ${hy + 16 * s}`;
+  return (
+    <g
+      opacity={opacity}
+      fill="none"
+      stroke={color}
+      strokeWidth={6 * s}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={eye(-14 * s)} />
+      <path d={eye(14 * s)} />
+      <path d={mouth} />
+    </g>
+  );
+};

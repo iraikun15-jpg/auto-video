@@ -114,3 +114,29 @@ export const SIT_TYPING: Pose = {
   frontThigh: 92,
   frontShin: -90,
 };
+
+/** 歩きの脚・腕の振り（第2話 seg4 と同じ式。第3話から共通化） */
+export const walkPose = (p: Pose, phase: number, amp = 1): Pose =>
+  shiftPose(p, {
+    frontThigh: Math.sin(phase) * 26 * amp,
+    backThigh: -Math.sin(phase) * 26 * amp,
+    frontShin: -Math.max(0, Math.cos(phase)) * 25 * amp,
+    backShin: -Math.max(0, -Math.cos(phase)) * 25 * amp,
+    frontArm: -Math.sin(phase) * 18 * amp,
+    backArm: Math.sin(phase) * 18 * amp,
+    y: -Math.abs(Math.sin(phase)) * 8 * amp,
+  });
+
+/** 椅子に座って卓に向かう姿勢（第3話「いつもの店」用） */
+export const SIT_TABLE: Pose = {
+  ...base,
+  torso: 4,
+  backArm: 30,
+  backFore: 60,
+  frontArm: 38,
+  frontFore: 55,
+  backThigh: 86,
+  backShin: -84,
+  frontThigh: 92,
+  frontShin: -90,
+};

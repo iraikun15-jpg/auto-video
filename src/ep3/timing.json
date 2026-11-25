@@ -1,0 +1,18 @@
+{
+  "fps": 30,
+  "holdFrames": 9,
+  "segments": [
+    { "id": "seg1", "frames": 90, "label": "フック（今度ご飯行こう！）" },
+    { "id": "seg2", "frames": 300, "label": "小ネタ1 合う日は来年" },
+    { "id": "seg3", "frames": 330, "label": "小ネタ2 LINEだけ作って解散" },
+    { "id": "seg4", "frames": 330, "label": "小ネタ3 結局いつもの店" },
+    { "id": "seg5", "frames": 240, "label": "二択締め" }
+  ],
+  "marks": [
+    { "segment": "seg2", "frame": 222, "note": "「来年」のページでピタッと止まる" },
+    { "segment": "seg3", "frame": 36, "note": "「グループを作成しました」が出そろう（ここから期待の間）" },
+    { "segment": "seg3", "frame": 120, "note": "沈黙が始まる（誰も何も送らない）" },
+    { "segment": "seg3", "frame": 240, "note": "画面が暗くなり始める" },
+    { "segment": "seg4", "frame": 0, "note": "場面転換：いつもの店" }
+  ]
+}
