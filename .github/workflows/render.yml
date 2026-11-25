@@ -31,10 +31,10 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install Japanese fonts
+      - name: Install Japanese fonts and ffmpeg (for frame check)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk ffmpeg
 
       - name: Install dependencies
         run: npm ci
