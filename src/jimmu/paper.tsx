@@ -21,7 +21,7 @@ export const sway = (f: number, seed: number, amp = 1.2, speed = 0.06) =>
  *  - paperLow: 落ち影を浅くしたもの（小さい部品用）
  *  - washi: 和紙の繊維ノイズ
  */
-const Defs: React.FC = () => (
+const Defs: React.FC<{ f: number }> = ({ f }) => (
   <defs>
     <filter id="paper" x="-20%" y="-20%" width="140%" height="140%">
       <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="n" />
@@ -42,7 +42,7 @@ const Defs: React.FC = () => (
       <feColorMatrix values="0 0 0 0 0.45  0 0 0 0 0.33  0 0 0 0 0.16  0 0 0 0.55 -0.12" />
     </filter>
     {/* 海の青海波もよう */}
-    <pattern id="seigaiha" width="64" height="32" patternUnits="userSpaceOnUse">
+    <pattern id="seigaiha" width="64" height="32" patternUnits="userSpaceOnUse" patternTransform={`translate(${(f * 0.8) % 64},${Math.sin(f * 0.05) * 4})`}>
       {[0, 64].map((x) =>
         [22, 15, 8].map((r) => (
           <path key={`${x}-${r}`} d={`M${x - r},32 A${r},${r} 0 0 1 ${x + r},32`} fill="none" stroke={AI_LIGHT} strokeWidth={2.4} />
@@ -56,14 +56,16 @@ const Defs: React.FC = () => (
 );
 
 /** 台紙（和紙）＋SVGキャンバス。children は SVG 要素 */
-export const Stage: React.FC<{ children: React.ReactNode; tint?: string; tintOpacity?: number }> = ({
-  children,
-  tint,
-  tintOpacity = 0,
-}) => (
+export const Stage: React.FC<{
+  children: React.ReactNode;
+  tint?: string;
+  tintOpacity?: number;
+  f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
+  peel?: boolean; // 冒頭で前の紙がめくれて剥がれる
+}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true }) => (
   <AbsoluteFill style={{ backgroundColor: PAPER_BG }}>
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
-      <Defs />
+      <Defs f={f} />
       <rect width={W} height={H} fill={PAPER_BG} />
       <rect width={W} height={H} filter="url(#washiSpots)" opacity={0.5} />
       {children}
@@ -75,9 +77,56 @@ export const Stage: React.FC<{ children: React.ReactNode; tint?: string; tintOpa
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
+      <Flecks f={f} />
+      {peel ? <PeelIn f={f} /> : null}
     </svg>
   </AbsoluteFill>
 );
+
+/** ゆっくり舞う金と紙の小片（画面が止まって見えないように） */
+const Flecks: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 14 }, (_, i) => {
+      const sx = random(`fx${i}`) * W;
+      const speed = 0.6 + random(`fs${i}`) * 0.9;
+      const y = ((random(`fy${i}`) * (H + 200) + f * speed) % (H + 200)) - 100;
+      const x = sx + Math.sin(f * 0.03 + i) * 40;
+      const r = 5 + random(`fr${i}`) * 7;
+      return (
+        <rect
+          key={i}
+          x={x - r}
+          y={y - r * 0.6}
+          width={r * 2}
+          height={r * 1.2}
+          rx={2}
+          fill={i % 3 === 0 ? KIN : PAPER}
+          opacity={0.55}
+          transform={`rotate(${f * (2 + i) + i * 40},${x},${y})`}
+        />
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：前の場面の紙が、破れた端からめくれて左へ剥がれていく */
+const PeelIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 13, Easing.in(Easing.quad));
+  if (t >= 1) return null;
+  const off = -300 - t * 1300;
+  const edge = Array.from({ length: 25 }, (_, i) => {
+    const y = -150 + i * 92;
+    return `L${W + 40 + (random(`pe${i}`) - 0.5) * 70},${y}`;
+  }).join("");
+  return (
+    <g transform={`translate(${off},${t * 120}) rotate(${-t * 14},${W},${H / 2})`}>
+      <g filter="url(#paper)">
+        <path d={`M-400,-150 ${edge} L-400,${H + 150}Z`} fill={PAPER_BG} />
+      </g>
+      <path d={`M-400,-150 ${edge} L-400,${H + 150}Z`} filter="url(#washi)" opacity={0.4} />
+    </g>
+  );
+};
 
 // ---------- 地図 ----------
 /** 海（藍の紙）と陸（生成りの紙）。frame でゆらぎを入れない静かな地図 */

@@ -1,5 +1,5 @@
 import React from "react";
-import { Easing, interpolate, useCurrentFrame } from "remotion";
+import { Easing, interpolate, random, useCurrentFrame } from "remotion";
 import timing from "./timing.json";
 import {
   CAM_IKOMA,
@@ -98,11 +98,11 @@ const YamatoLabel: React.FC<{ cam: Cam; t: number }> = ({ cam, t }) => {
 // =====================================================================
 export const Seg1: React.FC = () => {
   const f = useSegFrame("seg1");
-  const cam = CAM_WEST;
+  const cam = { ...CAM_WEST, lon: CAM_WEST.lon + f * 0.0012 };
   const hy = P(cam, PLACES.hyuga);
   const ya = P(cam, PLACES.yamato);
   return (
-    <Stage>
+    <Stage f={f} peel={false}>
       <MapLayer cam={cam} />
       <Route cam={cam} route={ROUTE_EAST} t={interpolate(f, [0, 45], [0.25, 1], { extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) })} dashed />
       <PlaceLabel x={hy[0]} y={hy[1]} text="日向" dx={-62} dy={-10} />
@@ -111,8 +111,17 @@ export const Seg1: React.FC = () => {
       <Token x={ya[0]} y={ya[1]} kind="enemy" r={30} rot={sway(f, 2, 4)} />
       {/* 対立の構図：左に神武、右に長髄彦 */}
       <Sun x={250} y={1340} r={95} rot={f * 0.4} opacity={0.9} />
-      <Person kind="jimmu" x={250} y={1800} scale={0.82} arm={50 + sway(f, 3, 4)} lean={sway(f, 4, 1.5)} />
-      <Person kind="nagasune" x={840} y={1800} scale={0.82} flip arm={60 + sway(f, 5, 4)} lean={sway(f, 6, 1.5)} />
+      <Person kind="jimmu" x={250} y={1800} scale={0.82} arm={50 + sway(f, 3, 4)} lean={sway(f, 4, 1.5) - 4 * ramp(f, 16, 40)} draw={ramp(f, 16, 40)} />
+      <Person
+        kind="nagasune"
+        x={840 - 30 * ramp(f, 20, 34)}
+        y={1800}
+        scale={0.82}
+        flip
+        arm={60 + 55 * ramp(f, 20, 34, Easing.out(Easing.back(2))) + sway(f, 5, 4)}
+        spearTilt={-25 * ramp(f, 20, 34)}
+        lean={sway(f, 6, 1.5) + 6 * ramp(f, 20, 34)}
+      />
       <Stamp x={540} y={1520} text="対" size={90} t={ramp(f, 18, 28)} rot={6} round />
       <Stamp x={540} y={205} text="実在？" size={150} t={ramp(f, 4, 14)} rot={-5} />
     </Stage>
@@ -124,7 +133,7 @@ export const Seg1: React.FC = () => {
 // =====================================================================
 export const Seg2: React.FC = () => {
   const f = useSegFrame("seg2");
-  const cam = CAM_WEST;
+  const cam = { ...CAM_WEST, lon: CAM_WEST.lon + f * 0.0008 };
   const route: LL[] = [...ROUTE_EAST, [135.7, 34.6], PLACES.kashihara];
   const tRoute = ramp(f, 18, 110, Easing.inOut(Easing.cubic));
   const pts = route.map((p) => P(cam, p));
@@ -133,7 +142,7 @@ export const Seg2: React.FC = () => {
   const ka = P(cam, PLACES.kashihara);
   const walking = f >= 18 && f < 110;
   return (
-    <Stage>
+    <Stage f={f}>
       <MapLayer cam={cam} />
       <Route cam={cam} route={route} t={tRoute} />
       <PlaceLabel x={hy[0]} y={hy[1]} text="日向" dx={-62} dy={-10} />
@@ -149,7 +158,8 @@ export const Seg2: React.FC = () => {
         y={1800}
         scale={0.82}
         walk={walking ? f * 0.32 : undefined}
-        arm={walking ? 30 : 50}
+        arm={walking ? 30 : 50 + 40 * ramp(f, 150, 166)}
+        turn={interpolate(ramp(f, 112, 124, Easing.inOut(Easing.cubic)) - ramp(f, 150, 162, Easing.inOut(Easing.cubic)), [0, 1], [1, -1])}
       />
       <Tag x={720} y={1390} text="紀元前660年" size={78} t={pop(f, 112, 12)} rot={-2} />
       <Stamp x={720} y={1560} text="即位" size={80} t={ramp(f, 124, 134)} rot={-6} />
@@ -163,17 +173,51 @@ export const Seg2: React.FC = () => {
 // =====================================================================
 export const Seg3: React.FC = () => {
   const f = useSegFrame("seg3");
-  const split = ramp(f, 150, 190, Easing.in(Easing.cubic));
-  const tagPiece = (x: number, y: number, text: string, size: number, side: -1 | 1, clipW: number) => {
-    const fall = split * 260;
-    return (
-      <g transform={`translate(${side * split * 70},${fall * (side === -1 ? 1 : 1.3)}) rotate(${side * split * 14},${x},${y})`} opacity={1 - split * 0.7}>
-        <clipPath id={`clip-${text}-${side}`}>
-          <rect x={side === -1 ? 0 : x} y={0} width={side === -1 ? x : 1080 - x} height={H} />
-        </clipPath>
-        <g clipPath={`url(#clip-${text}-${side})`}>
-          <Tag x={x} y={y} text={text} size={size} t={pop(f, side === -1 ? 0 : 0, 10)} rot={-2} />
+  // 札が下から焦げていき（140〜168）、168フレームで燃え尽きて紙片と火の粉になって舞い上がる
+  const char = ramp(f, 140, 168, Easing.in(Easing.quad));
+  const split = ramp(f, 168, 200);
+  const burnTag = (x: number, y: number, text: string, size: number, seed: number) => {
+    const w = [...text].length * size * 0.98 + size * 0.9;
+    const h = size * 1.6;
+    if (f < 168) {
+      const shake = char > 0 ? Math.sin(f * 2.1 + seed) * 4 * char : 0;
+      const top = y + h / 2 - h * 1.1 * char;
+      return (
+        <g transform={`translate(${shake},0)`}>
+          <Tag x={x} y={y} text={text} size={size} t={pop(f, 0, 10)} rot={-2} />
+          {char > 0 ? (
+            <g transform={`rotate(-2,${x},${y})`}>
+              <clipPath id={`burn-${seed}`}>
+                <rect x={x - w / 2 - 10} y={top} width={w + 20} height={h} />
+              </clipPath>
+              <rect x={x - w / 2} y={y - h / 2} width={w} height={h} fill="#2a1a10" opacity={0.85} clipPath={`url(#burn-${seed})`} />
+              <path
+                d={Array.from({ length: 16 }, (_, i) => `${i ? "L" : "M"}${x - w / 2 + (w * i) / 15},${top + Math.sin(i * 1.7 + f * 0.6) * 8}`).join("")}
+                stroke="#E8762E"
+                strokeWidth={8}
+                fill="none"
+                opacity={0.9}
+              />
+            </g>
+          ) : null}
         </g>
+      );
+    }
+    // 紙片と火の粉
+    return (
+      <g opacity={1 - split}>
+        {Array.from({ length: 22 }, (_, i) => {
+          const rx = random(`bx${seed}-${i}`) - 0.5;
+          const ry = random(`by${seed}-${i}`);
+          const px = x + rx * w + rx * 260 * split;
+          const py = y + (ry - 0.5) * h - (120 + ry * 380) * split;
+          const sz = 14 + random(`bs${seed}-${i}`) * 26;
+          return i % 3 === 0 ? (
+            <circle key={i} cx={px} cy={py - 40 * split} r={sz * 0.25} fill={i % 2 ? "#E8762E" : KIN} />
+          ) : (
+            <rect key={i} x={px - sz / 2} y={py - sz / 2} width={sz} height={sz * 0.7} fill={i % 2 ? "#2a1a10" : PAPER} transform={`rotate(${(rx * 720 + 30) * split},${px},${py})`} />
+          );
+        })}
       </g>
     );
   };
@@ -183,7 +227,7 @@ export const Seg3: React.FC = () => {
   const b: [number, number] = [640, 560];
   const curve = [a, mix(a, [940, 430], 1), b] as [number, number][];
   return (
-    <Stage>
+    <Stage f={f}>
       <Heading text="でも実は" t={pop(f, 0, 10)} y={170} size={70} />
       <Tag x={860} y={300} text="後の時代" size={56} t={pop(f, 28, 10)} rot={4} bg={PAPER_DARK} />
       {back > 0 ? (
@@ -198,16 +242,8 @@ export const Seg3: React.FC = () => {
         />
       ) : null}
       <Tag x={760} y={460} text="逆算" size={48} t={pop(f, 80, 10)} rot={-6} bg={SHU} color={PAPER} />
-      {split < 1 ? (
-        <>
-          {tagPiece(540, 680, "紀元前660年", 110, -1, 540)}
-          {tagPiece(540, 680, "紀元前660年", 110, 1, 540)}
-          {tagPiece(540, 960, "127歳", 120, -1, 540)}
-          {tagPiece(540, 960, "127歳", 120, 1, 540)}
-        </>
-      ) : null}
-      {/* 裂け目の朱線 */}
-      {f >= 140 && f < 160 ? <rect x={535} y={540} width={10} height={520 * ramp(f, 140, 150)} fill={SHU} /> : null}
+      {burnTag(540, 680, "紀元前660年", 110, 1)}
+      {burnTag(540, 960, "127歳", 120, 2)}
       <Stamp x={540} y={820} text="後付け" size={120} t={ramp(f, 108, 118)} rot={-9} />
       <Stamp x={540} y={1240} text="史実とは考えにくい" size={66} t={ramp(f, 196, 206)} rot={3} />
       {/* 神武の影が薄れていく */}
@@ -228,11 +264,11 @@ export const Seg3: React.FC = () => {
 // =====================================================================
 export const Seg4: React.FC = () => {
   const f = useSegFrame("seg4");
-  const cam = CAM_WEST;
+  const cam = { ...CAM_WEST, lon: CAM_WEST.lon - 0.15 + f * 0.0011 };
   const west = P(cam, [130.6, 32.6]);
   const east = P(cam, [136.4, 34.3]);
   return (
-    <Stage>
+    <Stage f={f}>
       <MapLayer cam={cam} opacity={ramp(f, 0, 14)} />
       <Heading text="全部ウソ？" t={pop(f, 4, 10)} y={200} size={78} />
       <Stamp x={800} y={315} text="とは限らない" size={46} t={ramp(f, 40, 50)} rot={8} />
@@ -293,7 +329,7 @@ export const Seg5: React.FC = () => {
   const hit = f >= 132;
   const itsuseFade = ramp(f, 205, 240);
   return (
-    <Stage>
+    <Stage f={f}>
       <MapLayer cam={cam} seaRect={[interpolate(zoomT, [0, 1], [40, 0]), interpolate(zoomT, [0, 1], [330, 0]), interpolate(zoomT, [0, 1], [1000, 1080]), interpolate(zoomT, [0, 1], [900, 1920])]} />
       <Route cam={cam} route={ROUTE_EAST} t={1} width={interpolate(zoomT, [0, 1], [10, 14])} head={false} opacity={0.8} />
       <IkomaRidge cam={cam} t={ramp(f, 30, 70)} />
@@ -325,16 +361,45 @@ export const Seg5: React.FC = () => {
       <Tag x={330} y={1420} text="兄・五瀬命" size={64} t={pop(f, 185, 10)} rot={2} bg={SHU} color={PAPER} />
       {/* 下段：山の上の長髄彦と、押し戻される神武 */}
       <Mountains x={480} baseY={1960} w={700} h={330} colors={["#56603F", KUSA]} seed={7} t={ramp(f, 60, 90)} />
-      <Person kind="nagasune" x={900} y={interpolate(ramp(f, 80, 105), [0, 1], [2400, 1700])} scale={0.78} flip arm={interpolate(ramp(f, 104, 112), [0, 1], [40, 95])} />
+      <Person
+        kind="nagasune"
+        x={900 - 40 * (ramp(f, 116, 124) - ramp(f, 132, 146))}
+        y={interpolate(ramp(f, 80, 105), [0, 1], [2400, 1700])}
+        scale={0.78}
+        flip
+        arm={40 + 60 * ramp(f, 104, 114, Easing.out(Easing.back(2)))}
+        spearTilt={-55 * (ramp(f, 116, 124, Easing.out(Easing.cubic)) - ramp(f, 132, 146))}
+        lean={10 * (ramp(f, 116, 124) - ramp(f, 132, 146))}
+      />
+      {/* 兄・五瀬命（神武のうしろ）：矢を受けてひざをつき、倒れる */}
+      <g opacity={1 - ramp(f, 200, 235) * 0.7}>
+        <Person
+          kind="itsuse"
+          color="#9E3A2A"
+          x={interpolate(back, [0, 1], [470, 380])}
+          y={1880}
+          scale={0.58}
+          arm={40}
+          kneel={ramp(f, 134, 150)}
+          fall={ramp(f, 152, 186, Easing.in(Easing.quad))}
+          opacity={ramp(f, 60, 75)}
+        />
+        {f >= 132 ? <Arrow x={interpolate(back, [0, 1], [470, 380]) + 10 - 60 * ramp(f, 152, 186)} y={1630 + 160 * ramp(f, 134, 150) + 150 * ramp(f, 152, 186)} angle={150} scale={1.1} /> : null}
+      </g>
       <Person
         kind="jimmu"
-        x={interpolate(back, [0, 1], [330, 190])}
+        x={interpolate(back, [0, 1], [300, 170])}
         y={1880}
         scale={0.62}
-        lean={interpolate(back, [0, 1], [0, -12])}
+        lean={interpolate(back, [0, 1], [0, -12]) - 5 * ramp(f, 62, 84)}
         arm={60}
+        draw={ramp(f, 62, 82) - ramp(f, 86, 90)}
         opacity={ramp(f, 60, 75)}
       />
+      {/* 神武の矢（放つが、届かない） */}
+      {f >= 86 && f < 104 ? (
+        <FlyingArrow a={[440, 1640]} b={[820, 1500]} t={ramp(f, 86, 104, Easing.linear)} scale={1.2} />
+      ) : null}
     </Stage>
   );
 };
@@ -358,7 +423,7 @@ export const Seg6: React.FC = () => {
   const power = interpolate(f, [60, 200], [1, 0.08], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const kusae = P(cam, PLACES.kusae);
   return (
-    <Stage tint="#7f93a8" tintOpacity={0.28}>
+    <Stage f={f} tint="#7f93a8" tintOpacity={0.28}>
       <MapLayer cam={cam} seaRect={[0, 0, 1080, 1920]} />
       <Route cam={cam} route={ROUTE_EAST} t={1} width={14} head={false} opacity={0.6} />
       <IkomaRidge cam={cam} t={1} />
@@ -387,7 +452,19 @@ export const Seg6: React.FC = () => {
           <rect x={212} y={-28} width={596 * power} height={56} fill={SHU} rx={4} />
         </g>
       </g>
-      <Stamp x={540} y={1620} text="都を置く余力なし" size={70} t={ramp(f, 196, 206)} rot={-4} />
+      {/* 余力が減るほど足取りが重くなる神武 */}
+      <Person
+        kind="jimmu"
+        x={900}
+        y={1890}
+        scale={0.4}
+        walk={0.3 * (f < 60 ? f : 60 + (f - 60) * (1 + power) * 0.5)}
+        stride={26 * (0.4 + 0.6 * power)}
+        lean={18 * (1 - power)}
+        arm={30}
+        opacity={ramp(f, 56, 66)}
+      />
+      <Stamp x={480} y={1640} text="都を置く余力なし" size={66} t={ramp(f, 196, 206)} rot={-4} />
     </Stage>
   );
 };
@@ -408,7 +485,7 @@ export const Seg7: React.FC = () => {
   const ka = P(cam, PLACES.kashihara);
   const ku = P(cam, PLACES.kumano);
   return (
-    <Stage>
+    <Stage f={f}>
       <MapLayer cam={cam} seaRect={[0, 0, 1080, 1920]} />
       <Route cam={cam} route={ROUTE_EAST} t={1} width={12} head={false} opacity={0.5} />
       <IkomaRidge cam={cam} t={1} />
@@ -465,13 +542,17 @@ export const Seg8: React.FC = () => {
     );
   };
   return (
-    <Stage>
+    <Stage f={f}>
       <Sun x={540} y={560} r={150} rot={f * 0.3} opacity={0.85} />
       <Person kind="jimmu" x={540} y={830} scale={0.62} arm={50 + sway(f, 1, 5)} color={SUMI} opacity={0.92} />
       <Heading text="君はどっち派？" t={pop(f, 0, 10)} y={200} size={88} />
       {card(290, "A", "実在", "した派", SHU, 12, 1)}
       {card(790, "B", "作られた", "派", AI, 22, 2)}
       <Tag x={540} y={1700} text="コメントで教えてね" size={60} t={pop(f, 40, 10)} rot={-1} />
+      {/* 八咫烏が二枚の札の上を横切る */}
+      {f >= 50 && f < 140 ? (
+        <Crow x={interpolate(f, [50, 140], [1260, -220])} y={880 + Math.sin(f * 0.12) * 30} scale={0.7} flap={Math.sin(f * 0.6)} flip />
+      ) : null}
     </Stage>
   );
 };

@@ -37,16 +37,26 @@ export const Person: React.FC<{
   lean?: number; // 体の傾き（度）
   opacity?: number;
   filter?: string;
-}> = ({ kind, x, y, scale = 1, flip = false, color, walk, stride = 26, arm = 45, lean = 0, opacity = 1, filter = "url(#paper)" }) => {
+  draw?: number; // 弓を引く度合い 0〜1（神武）
+  spearTilt?: number; // 矛の傾き（度、負で前へ倒す＝突き）
+  fall?: number; // 倒れる度合い 0〜1（足元を支点に後ろへ）
+  turn?: number; // 向き 1=そのまま、-1=反対向き（間は振り向き途中）
+  kneel?: number; // ひざをつく度合い 0〜1
+}> = ({
+  kind, x, y, scale = 1, flip = false, color, walk, stride = 26, arm: arm0 = 45, lean = 0, opacity = 1, filter = "url(#paper)",
+  draw = 0, spearTilt = 0, fall = 0, turn = 1, kneel = 0,
+}) => {
+  // 弓を引くときは前の腕を水平近くまで上げる
+  const arm = arm0 + (80 - arm0) * draw;
   const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : SHU);
   const tall = kind === "nagasune";
   // 長髄彦は「すねが長い」ので下腿を長く
   const legs: Limb = { hipX: 0, thigh: tall ? 120 : 110, shin: tall ? 200 : 120, w: tall ? 44 : 52 };
   const hipY = -(legs.thigh + legs.shin) - 10;
-  const sw = walk === undefined ? 0 : Math.sin(walk) * stride;
-  const knee = walk === undefined ? 0 : Math.max(0, -Math.cos(walk)) * 30;
-  const knee2 = walk === undefined ? 0 : Math.max(0, Math.cos(walk)) * 30;
-  const bob = walk === undefined ? 0 : Math.abs(Math.cos(walk)) * 8;
+  const sw = walk === undefined ? kneel * 50 : Math.sin(walk) * stride;
+  const knee = walk === undefined ? kneel * 100 : Math.max(0, -Math.cos(walk)) * 30;
+  const knee2 = walk === undefined ? kneel * 10 : Math.max(0, Math.cos(walk)) * 30;
+  const bob = (walk === undefined ? 0 : Math.abs(Math.cos(walk)) * 8) - kneel * 120;
   const torsoH = tall ? 220 : 205;
   const shoulderY = hipY - torsoH;
   const headR = tall ? 54 : 58;
@@ -62,13 +72,13 @@ export const Person: React.FC<{
   );
 
   return (
-    <g transform={`translate(${x},${y - bob * scale}) scale(${flip ? -scale : scale},${scale})`} opacity={opacity} filter={filter}>
+    <g transform={`translate(${x},${y - bob * scale}) scale(${(flip ? -scale : scale) * turn},${scale}) rotate(${-fall * 78})`} opacity={opacity} filter={filter}>
       {/* 後ろ足 */}
       {leg(sw, knee, "b")}
       <g transform={`rotate(${lean},0,${hipY})`}>
         {/* 後ろの腕 */}
-        <Bar x={-6} y={shoulderY + 20} len={120} deg={walk === undefined ? 12 : -sw * 0.8 + 8} w={36} fill={fill}>
-          <Bar x={0} y={0} len={105} deg={-18} w={30} fill={fill} />
+        <Bar x={-6} y={shoulderY + 20} len={120} deg={(walk === undefined ? 12 : -sw * 0.8 + 8) * (1 - draw) + 84 * draw} w={36} fill={fill}>
+          <Bar x={0} y={0} len={105} deg={-18 * (1 - draw) - 150 * draw} w={30} fill={fill} />
         </Bar>
         {/* 胴（衣・よろい） */}
         {tall ? (
@@ -104,12 +114,19 @@ export const Person: React.FC<{
         {kind === "jimmu" || kind === "itsuse" ? (
           <rect x={-150} y={hipY - 44} width={190} height={14} rx={6} fill={fill} transform={`rotate(-24,-20,${hipY - 40})`} />
         ) : null}
+        {/* 番えた矢（弓を引いているときだけ） */}
+        {draw > 0.25 ? (
+          <g opacity={Math.min(1, (draw - 0.25) * 4)}>
+            <rect x={20 - 60 * draw} y={shoulderY + 4} width={250} height={9} fill={fill} />
+            <path d={`M${290 - 60 * draw},${shoulderY + 8} L${262 - 60 * draw},${shoulderY - 8} L${262 - 60 * draw},${shoulderY + 24}Z`} fill={fill} />
+          </g>
+        ) : null}
         {/* 前の腕＋持ち物 */}
         <Bar x={12} y={shoulderY + 22} len={118} deg={-(arm) + (walk === undefined ? 0 : sw * 0.6)} w={36} fill={fill}>
           <Bar x={0} y={0} len={100} deg={-30} w={30} fill={fill}>
             {kind === "nagasune" ? (
               // 矛（ほこ）
-              <g transform={`rotate(${arm + 30})`}>
+              <g transform={`rotate(${arm + 30 + spearTilt})`}>
                 <rect x={-9} y={-470} width={18} height={720} fill={fill} />
                 <path d="M0,-560 L26,-470 L-26,-470Z" fill={fill} />
               </g>
