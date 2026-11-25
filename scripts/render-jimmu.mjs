@@ -1,6 +1,6 @@
 // 歴史ch 第1本「神武東征」Short の納品物一式を out/jimmu/ に書き出す
 //  ① jimmu_full.mp4（結合済み・無音）
-//  ② jimmu_seg1.mp4〜jimmu_seg8.mp4（セグメント別・無音）
+//  ② jimmu_seg1.mp4〜jimmu_seg9.mp4（セグメント別・無音）
 //  ③ jimmu_thumbnail.png
 //  ④ jimmu_timing.md（各セグメントの実尺）
 import { execFileSync } from "node:child_process";
@@ -85,7 +85,7 @@ const md = `# 歴史ch 第1本「神武天皇は実在したのか」Short タ�
 - 解像度: ${full.width}×${full.height} / ${fps}fps / H.264 / 音声トラックなし
 - 結合版 jimmu_full.mp4 の実尺: **${sec(full.frames)}秒（${full.frames}フレーム）**
 - 各セグメントの末尾 ${holdFrames}フレーム（${sec(holdFrames)}秒）は動きを止めた余白です
-- 尺は台本の目安秒数どおりの仮組みです（seg8 の締めは5秒）。ナレーションの実尺が決まったら合わせ直せます
+- 尺は台本の目安秒数どおりの仮組みです（seg8 の二択は5秒、seg9 のチャンネル登録は3秒）。ナレーションの実尺が決まったら合わせ直せます
 
 | セグメント | 内容 | 実尺(秒) | フレーム数 | 結合版の開始(秒) | 結合版の終了(秒) | 静止の開始(秒) |
 |---|---|---|---|---|---|---|

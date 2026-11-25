@@ -557,4 +557,52 @@ export const Seg8: React.FC = () => {
   );
 };
 
-export const SEGMENTS: Record<string, React.FC> = { seg1: Seg1, seg2: Seg2, seg3: Seg3, seg4: Seg4, seg5: Seg5, seg6: Seg6, seg7: Seg7, seg8: Seg8 };
+// =====================================================================
+// seg9 チャンネル登録お願いします：八咫烏が朱の登録ボタンをつついて押す
+// =====================================================================
+export const Seg9: React.FC = () => {
+  const f = useSegFrame("seg9");
+  const PRESS = 44; // 烏がボタンをつつくフレーム
+  const btnIn = pop(f, 6, 12);
+  const pressed = ramp(f, PRESS, PRESS + 3) - ramp(f, PRESS + 5, PRESS + 12) * 0.6;
+  const bx = 540;
+  const by = 1000;
+  // 烏：右上から飛んできてボタンの上でつつき、少し上に戻る
+  const fly = ramp(f, 14, PRESS - 4, Easing.out(Easing.cubic));
+  const peck = Math.max(0, Math.sin(clamp01((f - (PRESS - 6)) / 10) * Math.PI));
+  const crowX = interpolate(fly, [0, 1], [1300, bx + 300]);
+  const crowY = interpolate(fly, [0, 1], [380, by - 190]) + peck * 75 - ramp(f, PRESS + 8, PRESS + 30) * 40;
+  return (
+    <Stage f={f}>
+      <Sun x={540} y={560} r={130} rot={f * 0.4} opacity={0.75 * ramp(f, 0, 14)} />
+      <Heading text="この動画がよかったら" t={pop(f, 2, 10)} y={260} size={64} />
+      {btnIn > 0 ? (
+        <g transform={`translate(${bx},${by + pressed * 10}) scale(${interpolate(btnIn, [0, 1], [0.3, 1]) * (1 - pressed * 0.05)})`} opacity={clamp01(btnIn * 2)}>
+          <g filter={pressed > 0.5 ? "url(#paperLow)" : "url(#paper)"}>
+            <rect x={-380} y={-120} width={760} height={240} rx={120} fill={SHU} />
+          </g>
+          <rect x={-356} y={-96} width={712} height={192} rx={96} fill="none" stroke={PAPER} strokeWidth={5} opacity={0.6} />
+          {/* 再生マーク風の三角 */}
+          <path d="M-305,-42 L-232,0 L-305,42Z" fill={PAPER} />
+          <text x={72} y={30} textAnchor="middle" fontFamily={MINCHO} fontWeight={800} fontSize={84} fill={PAPER}>
+            チャンネル登録
+          </text>
+        </g>
+      ) : null}
+      {/* つついた瞬間の金の放射 */}
+      {f >= PRESS && f < PRESS + 16 ? (
+        <g opacity={1 - ramp(f, PRESS, PRESS + 16)}>
+          {Array.from({ length: 10 }, (_, i) => {
+            const a = (i / 10) * Math.PI * 2;
+            const r0 = 260 + ramp(f, PRESS, PRESS + 16) * 160;
+            return <rect key={i} x={-8} y={-40} width={16} height={60} fill={KIN} transform={`translate(${bx + Math.cos(a) * r0 * 1.4},${by + Math.sin(a) * r0 * 0.6}) rotate(${(a * 180) / Math.PI + 90})`} />;
+          })}
+        </g>
+      ) : null}
+      {f >= 12 ? <Crow x={crowX} y={crowY} scale={1.05} flap={f < PRESS - 4 ? Math.sin(f * 0.8) : Math.sin(f * 0.25) * 0.3} flip /> : null}
+      <Stamp x={540} y={1330} text="お願いします" size={96} t={ramp(f, PRESS + 6, PRESS + 16)} rot={-4} />
+    </Stage>
+  );
+};
+
+export const SEGMENTS: Record<string, React.FC> = { seg1: Seg1, seg2: Seg2, seg3: Seg3, seg4: Seg4, seg5: Seg5, seg6: Seg6, seg7: Seg7, seg8: Seg8, seg9: Seg9 };
