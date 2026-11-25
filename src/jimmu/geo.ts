@@ -43,7 +43,7 @@ export const HONSHU: LL[] = [
  * 海岸線に細かいギザギザを足す（切り絵の切り口）。
  * 経度緯度の上で一度だけ決めるので、フレームごとに形が揺れない。
  */
-const roughen = (pts: LL[], seed: number, step = 0.04, amp = 0.009): LL[] => {
+export const roughen = (pts: LL[], seed: number, step = 0.04, amp = 0.009): LL[] => {
   const out: LL[] = [];
   let k = seed * 1000;
   const rnd = () => {

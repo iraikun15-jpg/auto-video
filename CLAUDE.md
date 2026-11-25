@@ -16,7 +16,7 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 
 ## 自動公開（.github/workflows/render.yml）
 - push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- `video.mp4` は現在「神武東征」Short の結合版（`jimmu_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- `video.mp4` は現在「ヤマトタケル」Short の結合版（`takeru_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -41,6 +41,18 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
   - 書き出しは同時描画数を少なくしている（`JIMMU_CONCURRENCY`、既定は1）。増やすと描きかけのフレームが混ざる
 - 納品は棒人間シリーズと同じ形式（無音・セグメント別・末尾0.3秒静止）。尺は台本の目安秒数で仮組み（計58秒）。seg9 は依頼者の追加指示「チャンネル登録お願いします」（八咫烏が朱の登録ボタンをつつく）
 - 二択の「派」の読み指定（「ハ」）はナレーション原稿側の話。画面の文字は「派」のまま
+- チャンネル名は「もしも日本史ラボ」。固定締め文「以上、もしも日本史ラボでした。」
+
+### 第2本「ヤマトタケルは実在したのか」（`src/takeru/`、`npm run render:takeru`）
+- 第1本の部品（`src/jimmu/` の paper・figures・geo）を使い回す。東日本まで入る地図は `src/takeru/geo.ts`（`MapLayer` の `lands` に渡す）
+- 追加部品: 人物 `kind="takeru"`（剣を持つ）、`Swan`（白鳥）、`Boar`（白い猪）、`Sword`（草薙剣、`dashed` で IF の点線）
+- **今回から BGM・効果音入り**（ナレーションなし。声は依頼者側の「よしのん」が後付け）
+  - 音はすべて自前合成（`scripts/synth-takeru.mjs`）。BGM は陰旋法（D・E♭・G・A・B♭）の箏風の撥弦＋低い持続音。戦闘系にしない
+  - 効果音は控えめに：場面の切り替わり（紙めくり）・判子・登録ボタンのクリック
+  - 小さめに作る：全体 -28〜-27 LUFS、ピーク -6 dB 以下（ナレーションの余白）
+  - 場面の長さ・判子のフレーム・クリックのフレームは `src/takeru/events.ts` が正本。映像と音の両方がここを読む
+- 締めの順番は依頼者と相談して「二択（seg8）→ 登録エンドカード（seg9）」。台本の 8 と 9 は入れ替えて読む
+- 納品: 結合版（音あり）・軽量版・サムネ・タイミング表（場面の開始秒＋効果音の位置）。`render-takeru.mjs` がフレーム数・音声トラック・壊れたフレーム・ピークを自動確認する
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない

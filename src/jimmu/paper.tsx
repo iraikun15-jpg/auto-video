@@ -49,8 +49,9 @@ export const Stage: React.FC<{
   tint?: string;
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
-  peel?: boolean; // 冒頭で前の紙がめくれて剥がれる
-}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true }) => (
+  peel?: boolean; // 冒頭の場面転換を入れるか
+  look?: "jimmu" | "takeru"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物
+}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu" }) => (
   <AbsoluteFill style={{ backgroundColor: PAPER_BG }}>
     <Img src={staticFile("jimmu/washi_bg.jpg")} style={{ position: "absolute", width: W, height: H }} />
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute" }}>
@@ -66,8 +67,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      <Flecks f={f} />
-      {peel ? <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: 0.6 }} />
   </AbsoluteFill>
@@ -99,6 +100,50 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
   </g>
 );
 
+/** ゆっくり舞い落ちる白い羽根（ヤマトタケル回：白鳥伝説にちなむ） */
+const Feathers: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 9 }, (_, i) => {
+      const speed = 0.7 + random(`ws${i}`) * 0.8;
+      const y = ((random(`wy${i}`) * (H + 300) + f * speed) % (H + 300)) - 150;
+      const x = random(`wx${i}`) * W + Math.sin(f * 0.025 + i * 1.3) * 70;
+      const sc = 0.6 + random(`wr${i}`) * 0.7;
+      const rot = Math.sin(f * 0.03 + i) * 35 + i * 40;
+      return (
+        <g key={i} transform={`translate(${x},${y}) rotate(${rot}) scale(${sc})`} opacity={0.85}>
+          <path d="M0,-34 C14,-22 16,10 4,34 L-2,34 C-14,12 -12,-20 0,-34Z" fill="#FFFFFF" />
+          <path d="M0,-30 L1,40" stroke="#B9AE98" strokeWidth={2} />
+          <path d="M1,-6 L12,-14 M1,6 L13,-1 M0,-2 L-11,-10 M0,10 L-12,3" stroke="#D8CFBD" strokeWidth={1.5} />
+        </g>
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：木の軸の巻物が左から右へ転がり、軸の通ったあとに新しい場面が現れる（ヤマトタケル回） */
+const ScrollIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
+  if (t >= 1) return null;
+  const rx = -40 + t * (W + 100);
+  return (
+    <g>
+      <rect x={rx} y={0} width={W - rx + 60} height={H} fill={PAPER_BG} />
+      <linearGradient id="scrollRod" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stopColor="#4a2f18" />
+        <stop offset="0.45" stopColor="#a8794a" />
+        <stop offset="1" stopColor="#3d2612" />
+      </linearGradient>
+      <g filter="url(#paper)">
+        <rect x={rx - 26} y={-20} width={52} height={H + 40} fill="url(#scrollRod)" rx={10} />
+      </g>
+      {/* 巻物の紐（朱）と軸の金具 */}
+      <rect x={rx - 30} y={H / 2 - 10} width={60} height={20} fill={SHU} />
+      <rect x={rx - 34} y={-10} width={68} height={40} rx={8} fill={KIN} />
+      <rect x={rx - 34} y={H - 30} width={68} height={40} rx={8} fill={KIN} />
+    </g>
+  );
+};
+
 /** 冒頭：前の場面の紙が、破れた端からめくれて左へ剥がれていく */
 const PeelIn: React.FC<{ f: number }> = ({ f }) => {
   const t = ramp(f, 0, 13, Easing.in(Easing.quad));
@@ -119,10 +164,11 @@ const PeelIn: React.FC<{ f: number }> = ({ f }) => {
 
 // ---------- 地図 ----------
 /** 海（藍の紙）と陸（生成りの紙）。frame でゆらぎを入れない静かな地図 */
-export const MapLayer: React.FC<{ cam: Cam; opacity?: number; seaRect?: [number, number, number, number] }> = ({
+export const MapLayer: React.FC<{ cam: Cam; opacity?: number; seaRect?: [number, number, number, number]; lands?: LL[][] }> = ({
   cam,
   opacity = 1,
   seaRect = [40, 330, 1000, 900],
+  lands = LANDS,
 }) => {
   const [x, y, w, h] = seaRect;
   return (
@@ -137,7 +183,7 @@ export const MapLayer: React.FC<{ cam: Cam; opacity?: number; seaRect?: [number,
       <g clipPath="url(#seaClip)">
         <rect x={x} y={y} width={w} height={h} fill="url(#seigaiha)" opacity={0.55} />
         <g filter="url(#paper)">
-          {LANDS.map((land, i) => (
+          {lands.map((land, i) => (
             <path key={i} d={polyPath(land.map((p) => project(cam, p)))} fill={PAPER} />
           ))}
         </g>
@@ -247,8 +293,8 @@ export const PlaceLabel: React.FC<{ x: number; y: number; text: string; t?: numb
 };
 
 // ---------- 駒 ----------
-export type TokenKind = "jimmu" | "enemy" | "clan" | "itsuse";
-const TOKEN_COLORS: Record<TokenKind, string> = { jimmu: SHU, enemy: SUMI, clan: "#7d6b55", itsuse: SHU };
+export type TokenKind = "jimmu" | "enemy" | "clan" | "itsuse" | "takeru";
+const TOKEN_COLORS: Record<TokenKind, string> = { jimmu: SHU, enemy: SUMI, clan: "#7d6b55", itsuse: SHU, takeru: PAPER };
 
 /** 作戦盤の駒（丸い紙）。神武方は日輪、敵方は矛 */
 export const Token: React.FC<{ x: number; y: number; kind: TokenKind; r?: number; t?: number; label?: string; rot?: number }> = ({
@@ -265,10 +311,17 @@ export const Token: React.FC<{ x: number; y: number; kind: TokenKind; r?: number
   return (
     <g transform={`translate(${x},${y}) rotate(${rot}) scale(${s})`} opacity={clamp01(t * 3)}>
       <g filter="url(#paperLow)">
-        <circle r={r} fill={TOKEN_COLORS[kind]} />
+        <circle r={r} fill={TOKEN_COLORS[kind]} stroke={kind === "takeru" ? SUMI : undefined} strokeWidth={kind === "takeru" ? r * 0.12 : undefined} />
       </g>
-      <circle r={r * 0.82} fill="none" stroke={PAPER} strokeWidth={r * 0.07} opacity={0.75} />
-      {kind === "jimmu" || kind === "itsuse" ? (
+      <circle r={r * 0.82} fill="none" stroke={kind === "takeru" ? SUMI : PAPER} strokeWidth={r * 0.07} opacity={0.75} />
+      {kind === "takeru" ? (
+        // 白い駒に墨の剣
+        <g fill={SUMI}>
+          <path d={`M0,${-r * 0.66} L${r * 0.1},${-r * 0.5} L${r * 0.1},${r * 0.22} L${-r * 0.1},${r * 0.22} L${-r * 0.1},${-r * 0.5}Z`} />
+          <rect x={-r * 0.3} y={r * 0.22} width={r * 0.6} height={r * 0.1} />
+          <rect x={-r * 0.06} y={r * 0.32} width={r * 0.12} height={r * 0.3} />
+        </g>
+      ) : kind === "jimmu" || kind === "itsuse" ? (
         <g>
           <circle r={r * 0.3} fill={KIN} />
           {Array.from({ length: 8 }, (_, i) => (

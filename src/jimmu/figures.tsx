@@ -22,7 +22,7 @@ const Bar: React.FC<{ x: number; y: number; len: number; deg: number; w: number;
   </g>
 );
 
-export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse";
+export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru";
 
 export const Person: React.FC<{
   kind: PersonKind;
@@ -42,13 +42,34 @@ export const Person: React.FC<{
   fall?: number; // 倒れる度合い 0〜1（足元を支点に後ろへ）
   turn?: number; // 向き 1=そのまま、-1=反対向き（間は振り向き途中）
   kneel?: number; // ひざをつく度合い 0〜1
-}> = ({
-  kind, x, y, scale = 1, flip = false, color, walk, stride = 26, arm: arm0 = 45, lean = 0, opacity = 1, filter = "url(#paper)",
-  draw = 0, spearTilt = 0, fall = 0, turn = 1, kneel = 0,
+  outline?: boolean; // 墨のふち取り（白い切り絵用）。ヤマトタケルは既定でオン
+  strokeW?: number; // 内部用：ふち取りの太さ
+}> = (props) => {
+  const { kind, color, opacity = 1, filter = "url(#paper)" } = props;
+  const outline = props.outline ?? kind === "takeru";
+  if (outline) {
+    // 墨で少し太らせた影を下に敷き、その上に白い切り絵を重ねる
+    return (
+      <g opacity={opacity} filter={filter}>
+        <PersonBody {...props} color={SUMI} strokeW={16} />
+        <PersonBody {...props} color={color ?? PAPER} />
+      </g>
+    );
+  }
+  return (
+    <g opacity={opacity} filter={filter}>
+      <PersonBody {...props} />
+    </g>
+  );
+};
+
+const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
+  kind, x, y, scale = 1, flip = false, color, walk, stride = 26, arm: arm0 = 45, lean = 0,
+  draw = 0, spearTilt = 0, fall = 0, turn = 1, kneel = 0, strokeW,
 }) => {
   // 弓を引くときは前の腕を水平近くまで上げる
   const arm = arm0 + (80 - arm0) * draw;
-  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : SHU);
+  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : SHU);
   const tall = kind === "nagasune";
   // 長髄彦は「すねが長い」ので下腿を長く
   const legs: Limb = { hipX: 0, thigh: tall ? 120 : 110, shin: tall ? 200 : 120, w: tall ? 44 : 52 };
@@ -72,7 +93,12 @@ export const Person: React.FC<{
   );
 
   return (
-    <g transform={`translate(${x},${y - bob * scale}) scale(${(flip ? -scale : scale) * turn},${scale}) rotate(${-fall * 78})`} opacity={opacity} filter={filter}>
+    <g
+      transform={`translate(${x},${y - bob * scale}) scale(${(flip ? -scale : scale) * turn},${scale}) rotate(${-fall * 78})`}
+      stroke={strokeW ? fill : undefined}
+      strokeWidth={strokeW ? strokeW / scale : undefined}
+      strokeLinejoin="round"
+    >
       {/* 後ろ足 */}
       {leg(sw, knee, "b")}
       <g transform={`rotate(${lean},0,${hipY})`}>
@@ -130,6 +156,13 @@ export const Person: React.FC<{
                 <rect x={-9} y={-470} width={18} height={720} fill={fill} />
                 <path d="M0,-560 L26,-470 L-26,-470Z" fill={fill} />
               </g>
+            ) : kind === "takeru" ? (
+              // 剣（spearTilt で傾ける。負で前へ振り下ろす）
+              <g transform={`rotate(${arm + 30 + spearTilt})`}>
+                <rect x={-26} y={-18} width={52} height={14} rx={5} fill={fill} />
+                <rect x={-8} y={-4} width={16} height={60} rx={6} fill={fill} />
+                <path d="M-11,-18 L-11,-300 L0,-336 L11,-300 L11,-18Z" fill={fill} />
+              </g>
             ) : kind === "jimmu" ? (
               // 弓
               <g transform={`rotate(${arm + 30})`}>
@@ -185,5 +218,75 @@ export const Sun: React.FC<{ x: number; y: number; r: number; rot?: number; opac
       <path key={i} d={`M0,${-r * 1.08} L${r * 0.1},${-r * 1.42} L${-r * 0.1},${-r * 1.42}Z`} transform={`rotate(${i * 22.5})`} fill={color} />
     ))}
     <circle r={r} fill={color} />
+  </g>
+);
+
+/** 白鳥（白い切り絵）。翼のはばたき flap: -1〜1 */
+export const Swan: React.FC<{ x: number; y: number; scale?: number; flap?: number; flip?: boolean; opacity?: number }> = ({
+  x,
+  y,
+  scale = 1,
+  flap = 0,
+  flip = false,
+  opacity = 1,
+}) => {
+  const up = flap * 70;
+  return (
+    <g transform={`translate(${x},${y}) scale(${flip ? -scale : scale},${scale})`} filter="url(#paper)" opacity={opacity}>
+      <path d={`M-10,-10 Q-50,${-100 - up} -190,${-140 - up} Q-100,-40 -40,10Z`} fill="#E9E1CF" />
+      <ellipse cx={0} cy={0} rx={88} ry={36} fill={PAPER} />
+      {/* 長い首と頭 */}
+      <path d="M60,-14 Q120,-40 112,-110 Q108,-130 128,-134 L134,-120 Q124,-112 128,-96 Q136,-30 74,10Z" fill={PAPER} />
+      <path d="M128,-134 L168,-124 L132,-116Z" fill={KIN} />
+      <path d="M-80,-6 L-140,-22 L-128,4 L-84,14Z" fill={PAPER} />
+      <path d={`M0,-12 Q-14,${-130 - up} -150,${-170 - up} Q-40,${-70 - up * 0.3} -20,20Z`} fill={PAPER} />
+    </g>
+  );
+};
+
+/** 白い猪（伊吹山の神の使い）。白い切り絵 */
+export const Boar: React.FC<{ x: number; y: number; scale?: number; flip?: boolean; opacity?: number; step?: number }> = ({
+  x,
+  y,
+  scale = 1,
+  flip = false,
+  opacity = 1,
+  step = 0,
+}) => (
+  <g transform={`translate(${x},${y}) scale(${flip ? -scale : scale},${scale})`} filter="url(#paper)" opacity={opacity}>
+    {[-70, -40, 40, 70].map((lx, i) => (
+      <rect key={i} x={lx - 11} y={10} width={22} height={70} rx={8} fill={i % 2 ? "#E9E1CF" : PAPER} transform={`rotate(${Math.sin(step + i * 1.6) * 12},${lx},10)`} />
+    ))}
+    <ellipse cx={0} cy={0} rx={115} ry={62} fill={PAPER} />
+    {/* 背中のたてがみ */}
+    <path d="M-90,-40 L-60,-78 L-40,-50 L-15,-86 L5,-56 L30,-84 L50,-52 L80,-70 L95,-30Z" fill={PAPER} />
+    <path d="M90,-30 L170,-6 L176,24 L100,40Z" fill={PAPER} />
+    <path d="M150,18 Q176,10 168,-14" fill="none" stroke={KIN} strokeWidth={8} strokeLinecap="round" />
+    <circle cx={128} cy={-6} r={6} fill={SUMI} />
+    <path d="M-112,-10 Q-140,-30 -132,-50" fill="none" stroke={PAPER} strokeWidth={8} strokeLinecap="round" />
+  </g>
+);
+
+/** 草薙剣（金の切り絵）。原点が柄の端、上向き */
+export const Sword: React.FC<{ x: number; y: number; scale?: number; rot?: number; opacity?: number; color?: string; dashed?: boolean }> = ({
+  x,
+  y,
+  scale = 1,
+  rot = 0,
+  opacity = 1,
+  color = KIN,
+  dashed = false,
+}) => (
+  <g transform={`translate(${x},${y}) rotate(${rot}) scale(${scale})`} filter={dashed ? undefined : "url(#paperLow)"} opacity={opacity}>
+    {dashed ? (
+      <path d="M-10,0 L-10,-60 L-34,-60 L-34,-76 L-12,-76 L-12,-300 L0,-340 L12,-300 L12,-76 L34,-76 L34,-60 L10,-60 L10,0Z" fill="none" stroke={color} strokeWidth={6} strokeDasharray="14 10" />
+    ) : (
+      <g fill={color}>
+        <rect x={-10} y={-62} width={20} height={62} rx={6} />
+        <rect x={-36} y={-78} width={72} height={18} rx={6} />
+        <path d="M-12,-78 L-12,-300 L0,-340 L12,-300 L12,-78Z" />
+        <rect x={-2} y={-290} width={4} height={200} fill={SUMI} opacity={0.25} />
+      </g>
+    )}
   </g>
 );
