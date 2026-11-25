@@ -7,7 +7,8 @@
     "dev": "remotion studio",
     "render": "node scripts/render-ep2.mjs",
     "render:sample": "remotion render src/index.ts ShortVideo out/video.mp4 --codec=h264",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "render:jimmu": "node scripts/render-jimmu.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",

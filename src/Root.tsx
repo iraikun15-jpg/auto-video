@@ -6,6 +6,8 @@ import { FPS } from "./ep2/common";
 import { KaijuTest, KAIJU_FRAMES } from "./kaiju/KaijuTest";
 import { KaijuTestV2, KAIJU_V2_FRAMES } from "./kaiju/KaijuTestV2";
 import { KaijuV4, KAIJU_V4_FRAMES } from "./kaiju/v4/KaijuV4";
+import { Jimmu, JimmuSegments, JIMMU_TOTAL_FRAMES } from "./jimmu/Jimmu";
+import { JimmuThumbnail } from "./jimmu/Thumbnail";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -62,6 +64,13 @@ export const RemotionRoot: React.FC = () => {
         durationInFrames={KAIJU_V4_FRAMES}
         defaultProps={{ withAudio: true }}
       />
+
+      {/* 歴史ch 第1本「神武東征」Short：結合版＋セグメント別（無音・切り絵スタイル） */}
+      <Composition id="Jimmu" component={Jimmu} width={1080} height={1920} fps={30} durationInFrames={JIMMU_TOTAL_FRAMES} />
+      {JimmuSegments.map((s) => (
+        <Composition key={s.id} id={`Jimmu-${s.id}`} component={s.component} width={1080} height={1920} fps={30} durationInFrames={s.frames} />
+      ))}
+      <Still id="JimmuThumbnail" component={JimmuThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition

@@ -15,8 +15,8 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - フォントは `@remotion/google-fonts` の Noto Sans JP（weight 900）
 
 ## 自動公開（.github/workflows/render.yml）
-- push（.md だけの変更は除く）で第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- 最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
+- `video.mp4` は現在「神武東征」Short の結合版（`jimmu_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -30,6 +30,15 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
   - 各セグメントの終わりに 0.3秒の静止（`timing.json` の `holdFrames`）
   - 台本のセリフ・文言は変えない。ズーム多用禁止。全セグメントで棒人間を動かす
 - 第2話: `src/ep2/`、書き出しは `npm run render`（`scripts/render-ep2.mjs` がフレーム数と無音を検証してタイミング表を作る）
+
+## 歴史チャンネル（切り絵スタイル）
+- 第1本「神武天皇は実在したのか」Short: `src/jimmu/`、書き出しは `npm run render:jimmu`（`out/jimmu/` に結合版・seg1〜8・サムネ・タイミング表）
+- スタイル: 依頼者が「切り絵（Paper Cutout）＋地図の場面は作戦盤（Tactics Board）」を選んだ。和紙の台紙・藍の海（青海波）・朱/墨/金
+  - 部品: `paper.tsx`（台紙・地図・札・判子・駒・ルート・矢）、`figures.tsx`（影絵の人物・八咫烏・日輪）、`geo.ts`（簡略地図・カメラ・ルート）
+  - 人物は顔を描かない影絵（断定画にしない方針）。神武方=朱、長髄彦=墨、その他の豪族=茶
+  - 文字は しっぽり明朝B1（weight 800）
+- 納品は棒人間シリーズと同じ形式（無音・セグメント別・末尾0.3秒静止）。尺は台本の目安秒数で仮組み（計55秒）
+- 二択の「派」の読み指定（「ハ」）はナレーション原稿側の話。画面の文字は「派」のまま
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない
