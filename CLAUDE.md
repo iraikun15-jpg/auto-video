@@ -16,7 +16,7 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 
 ## 自動公開（.github/workflows/render.yml）
 - push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- `video.mp4` は現在「崇神」Short の結合版（`sujin_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- `video.mp4` は現在「草薙剣」Short の結合版（`kusanagi_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -63,6 +63,15 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
   - 判定のトーン：神武=人物は神話、ヤマトタケル=人物は合成、崇神=「実在した可能性のある最初の天皇」（2行の二重枠の朱判子＋金の「有力」）
 - BGM は笙風の和音＋律旋法（D・E・G・A・B）の箏（`scripts/synth-sujin.mjs`）。転換音は竹の御簾のカラカラ音。全体 -28.6 LUFS・ピーク -6 dB
 - 場面の並びは台本どおり（判定 → 二択 → 登録）
+
+### 第4本「草薙剣は本当にあったのか」（`src/kusanagi/`、`npm run render:kusanagi`）
+- この回だけ神話ファンタジー寄り（依頼者の注文は「かっこよく」）。`Stage look="kusanagi"` で夜の和紙（深い紺のグラデーション）＋蛍火の光の粒＋剣閃の場面転換（斜めの光で紙が切り分かれる）
+- 部品は `src/kusanagi/parts.tsx`：八岐大蛇（S字にうねる8本の首・金のふち・酸漿の赤い目・酔うと首が垂れる）、光る草薙剣 `GlowSword`、酒の甕、野火 `Flames`、薙がれる草 `Grass`、神明造の社殿 `Shrine`、不開門 `Gate`、波・泡・竜・竜宮・平家の舟
+- 人物：スサノオ `kind="susanoo"`（なびく髪）、僧 `kind="monk"`。夜の場面の影絵は濃紺の塗り＋金のふち（`outline outlineColor={KIN}`）。ヤマトタケルは第2本と同じ白
+- 地図コラージュは熱田への移動の場面（seg4）だけ。エンドカードは夜の上に生成りの紙を一枚貼って、これまでと同じ型にする
+- **判定の判子は使わない**。最後は「これはあった？ なかった？」の二択で開いて終わる。熱田の剣は画面文字で断定しない（「祀られているとされる」まで）
+- BGM は浮遊感のある持続和音（D のリディア風）＋ガラスの鈴（FM 合成）＋深い低音（`scripts/synth-kusanagi.mjs`）。効果音は剣閃（風切り＋金属の響き）・判子・不開門が閉まる音・クリック。全体 -27.5 LUFS
+- 剣の一閃（`events.ts` の `SLASHES`）は画面全体が光るので、壊れたフレームの自動チェックでは除外している
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない

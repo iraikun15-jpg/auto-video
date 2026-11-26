@@ -14,6 +14,9 @@ import { TOTAL_FRAMES as TAKERU_FRAMES } from "./takeru/events";
 import { Sujin } from "./sujin/Sujin";
 import { SujinThumbnail } from "./sujin/Thumbnail";
 import { TOTAL_FRAMES as SUJIN_FRAMES } from "./sujin/events";
+import { Kusanagi } from "./kusanagi/Kusanagi";
+import { KusanagiThumbnail } from "./kusanagi/Thumbnail";
+import { TOTAL_FRAMES as KUSANAGI_FRAMES } from "./kusanagi/events";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -85,6 +88,10 @@ export const RemotionRoot: React.FC = () => {
       {/* もしも日本史ラボ 第3本「本当の初代天皇は崇神？」（BGM・効果音入り） */}
       <Composition id="Sujin" component={Sujin} width={1080} height={1920} fps={30} durationInFrames={SUJIN_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="SujinThumbnail" component={SujinThumbnail} width={1080} height={1920} />
+
+      {/* もしも日本史ラボ 第4本「草薙剣は本当にあったのか」（神話ファンタジー寄り・BGM・効果音入り） */}
+      <Composition id="Kusanagi" component={Kusanagi} width={1080} height={1920} fps={30} durationInFrames={KUSANAGI_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="KusanagiThumbnail" component={KusanagiThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition

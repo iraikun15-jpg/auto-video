@@ -62,9 +62,16 @@ jobs:
         run: |
           START=$(date +%s)
           npm run render:sujin
-          cp out/sujin/sujin_full.mp4 out/video.mp4
           cat out/sujin/sujin_timing.md >> "$GITHUB_STEP_SUMMARY"
           echo "### 崇神 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Kusanagi short (mythic fantasy, with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:kusanagi
+          cp out/kusanagi/kusanagi_full.mp4 out/video.mp4
+          cat out/kusanagi/kusanagi_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 草薙剣 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Render low-poly 3D test
         run: |
@@ -89,10 +96,10 @@ jobs:
           TAG="video-${{ github.run_number }}"
           SHORT_SHA="${GITHUB_SHA::7}"
           gh release create "$TAG" \
-            out/video.mp4 out/sujin/* out/takeru/* out/jimmu/* out/ep2/* out/kaiju_test.mp4 out/kaiju_test_v2.mp4 out/kaiju_v4.mp4 \
+            out/video.mp4 out/kusanagi/* out/sujin/* out/takeru/* out/jimmu/* out/ep2/* out/kaiju_test.mp4 out/kaiju_test_v2.mp4 out/kaiju_v4.mp4 \
             --target "$GITHUB_SHA" \
             --title "動画 #${{ github.run_number }} (${GITHUB_REF_NAME} @ ${SHORT_SHA})" \
-            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした動画です。video.mp4 と sujin_full.mp4 は同じ（もしも日本史ラボ 第3本「本当の初代天皇は崇神？」・BGM と効果音入り・ナレーションなし）、sujin_full_light.mp4 はその軽量版、sujin_thumbnail.png はサムネイル、sujin_timing.md はタイミング表。takeru_* は第2本「ヤマトタケルは実在したのか」、jimmu_full.mp4 は第1本「神武天皇は実在したのか」（無音）、jimmu_seg1〜9 はセグメント別、jimmu_thumbnail.png はサムネイル、jimmu_timing.md はタイミング表。ep2_full.mp4 は第2話（無音）の結合版、ep2_seg1〜5 はセグメント別、ep2_timing.md はタイミング表、kaiju_test.mp4 / kaiju_test_v2.mp4 はローポリ3Dテスト（v1/v2）、kaiju_v4.mp4 は本編テスト v4（東京破壊・音あり）です。" \
+            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした動画です。video.mp4 と kusanagi_full.mp4 は同じ（もしも日本史ラボ 第4本「草薙剣は本当にあったのか」・BGM と効果音入り・ナレーションなし）、kusanagi_full_light.mp4 はその軽量版、kusanagi_thumbnail.png はサムネイル、kusanagi_timing.md はタイミング表。sujin_* は第3本「本当の初代天皇は崇神？」、takeru_* は第2本「ヤマトタケルは実在したのか」、jimmu_full.mp4 は第1本「神武天皇は実在したのか」（無音）、jimmu_seg1〜9 はセグメント別、jimmu_thumbnail.png はサムネイル、jimmu_timing.md はタイミング表。ep2_full.mp4 は第2話（無音）の結合版、ep2_seg1〜5 はセグメント別、ep2_timing.md はタイミング表、kaiju_test.mp4 / kaiju_test_v2.mp4 はローポリ3Dテスト（v1/v2）、kaiju_v4.mp4 は本編テスト v4（東京破壊・音あり）です。" \
             --latest
 
       - name: Upload to Google Drive

@@ -50,12 +50,25 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾
-}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu" }) => (
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
+}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
+  const dark = night ?? (look === "kusanagi" ? 1 : 0);
+  return (
   <AbsoluteFill style={{ backgroundColor: PAPER_BG }}>
     <Img src={staticFile("jimmu/washi_bg.jpg")} style={{ position: "absolute", width: W, height: H }} />
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute" }}>
       <Defs f={f} />
+      {dark > 0 ? (
+        <>
+          <linearGradient id="nightGrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stopColor="#0B1128" />
+            <stop offset="0.6" stopColor="#141E3E" />
+            <stop offset="1" stopColor="#1E2B4E" />
+          </linearGradient>
+          <rect width={W} height={H} fill="url(#nightGrad)" opacity={0.9 * dark} />
+        </>
+      ) : null}
       {children}
     </svg>
     {tint ? <AbsoluteFill style={{ backgroundColor: tint, opacity: tintOpacity, mixBlendMode: "multiply" }} /> : null}
@@ -67,12 +80,13 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
-    <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: 0.6 }} />
+    <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
-);
+  );
+};
 
 /** ゆっくり舞う金と紙の小片（画面が止まって見えないように） */
 const Flecks: React.FC<{ f: number }> = ({ f }) => (
@@ -99,6 +113,63 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** 蛍火のような光の粒がゆっくり昇る（草薙剣回） */
+const Motes: React.FC<{ f: number }> = ({ f }) => (
+  <g style={{ mixBlendMode: "screen" }}>
+    <radialGradient id="moteGrad">
+      <stop offset="0" stopColor="#FFF4C8" stopOpacity={1} />
+      <stop offset="0.35" stopColor="#E9C26A" stopOpacity={0.7} />
+      <stop offset="1" stopColor="#E9C26A" stopOpacity={0} />
+    </radialGradient>
+    <radialGradient id="moteGrad2">
+      <stop offset="0" stopColor="#E6FFF6" stopOpacity={1} />
+      <stop offset="0.35" stopColor="#7FD6C2" stopOpacity={0.7} />
+      <stop offset="1" stopColor="#7FD6C2" stopOpacity={0} />
+    </radialGradient>
+    {Array.from({ length: 16 }, (_, i) => {
+      const speed = 0.5 + random(`mo${i}`) * 0.9;
+      const y = H + 100 - ((random(`my${i}`) * (H + 200) + f * speed) % (H + 200));
+      const x = random(`mx${i}`) * W + Math.sin(f * 0.03 + i * 2.1) * 40;
+      const r = 10 + random(`mr${i}`) * 16;
+      const flicker = 0.55 + 0.45 * Math.sin(f * 0.15 + i * 1.3);
+      return <circle key={i} cx={x} cy={y} r={r} fill={`url(#${i % 3 === 0 ? "moteGrad2" : "moteGrad"})`} opacity={flicker} />;
+    })}
+  </g>
+);
+
+/** 冒頭：剣閃。斜めに光の線が走り、夜の紙が二つに切り分かれて左右へ退く（草薙剣回） */
+const SlashIn: React.FC<{ f: number }> = ({ f }) => {
+  const flash = ramp(f, 0, 3) * (1 - ramp(f, 5, 12));
+  const open = ramp(f, 3, 16, Easing.in(Easing.cubic));
+  if (open >= 1) return null;
+  // 切り口：左下 (-200,1500) → 右上 (1280,420)。法線方向に開く
+  const ax = -200, ay = 1500, bx = 1280, by = 420;
+  const nx = (ay - by) / Math.hypot(bx - ax, by - ay);
+  const ny = (bx - ax) / Math.hypot(bx - ax, by - ay);
+  const d = open * 1200;
+  const upper = `M${ax},${ay} L${bx},${by} L${bx},-400 L${ax},-400Z`;
+  const lower = `M${ax},${ay} L${bx},${by} L${bx},${H + 400} L${ax},${H + 400}Z`;
+  return (
+    <g>
+      <g transform={`translate(${-nx * d},${-ny * d})`}>
+        <path d={upper} fill="#0E1530" />
+        <path d={`M${ax},${ay} L${bx},${by}`} stroke={KIN} strokeWidth={6} />
+      </g>
+      <g transform={`translate(${nx * d},${ny * d})`}>
+        <path d={lower} fill="#121A36" />
+        <path d={`M${ax},${ay} L${bx},${by}`} stroke={KIN} strokeWidth={6} />
+      </g>
+      {flash > 0 ? (
+        <g opacity={flash}>
+          <path d={`M${ax},${ay} L${bx},${by}`} stroke="#FFF6D8" strokeWidth={60} opacity={0.25} />
+          <path d={`M${ax},${ay} L${bx},${by}`} stroke="#FFF6D8" strokeWidth={22} opacity={0.6} />
+          <path d={`M${ax},${ay} L${bx},${by}`} stroke="#FFFFFF" strokeWidth={6} />
+        </g>
+      ) : null}
+    </g>
+  );
+};
 
 /** ゆっくり舞い落ちる杉の葉（崇神回：三輪の神杉にちなむ） */
 const SugiLeaves: React.FC<{ f: number }> = ({ f }) => (
