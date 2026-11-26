@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
   const dark = night ?? (look === "kusanagi" ? 1 : 0);
@@ -80,8 +80,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
@@ -113,6 +113,50 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** 小さな銅鏡がくるりと回りながら漂い、ときどき光る（卑弥呼回） */
+const MirrorGlints: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 10 }, (_, i) => {
+      const speed = 0.3 + random(`mg${i}`) * 0.5;
+      const y = ((random(`mgy${i}`) * (H + 200) + f * speed) % (H + 200)) - 100;
+      const x = random(`mgx${i}`) * W + Math.sin(f * 0.02 + i * 2.3) * 40;
+      const r = 12 + random(`mgr${i}`) * 12;
+      const flip = Math.cos(f * 0.06 + i * 1.1);
+      const shine = Math.max(0, flip) ** 8;
+      return (
+        <g key={i} transform={`translate(${x},${y}) scale(${Math.abs(flip) * 0.9 + 0.1},1)`} opacity={0.55}>
+          <circle r={r} fill="#A67C3D" />
+          <circle r={r * 0.7} fill="none" stroke="#7A5A2A" strokeWidth={2} />
+          <circle r={r * 0.2} fill="#7A5A2A" />
+          {shine > 0.05 ? <circle r={r * 1.6} fill="#FFF1C2" opacity={0.5 * shine} /> : null}
+        </g>
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：線装本のページが右から左へめくれ、次の場面が現れる（卑弥呼回） */
+const PageTurnIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
+  if (t >= 1) return null;
+  // ページは左端（綴じ側）を軸にして、幅が 1→0 に縮みながら左へ倒れる
+  const wPage = W * (1 - t);
+  const cols = 9;
+  return (
+    <g>
+      <g filter="url(#paper)">
+        <rect x={0} y={0} width={wPage} height={H} fill="#EFE4CC" />
+      </g>
+      {Array.from({ length: cols }, (_, i) => (
+        <rect key={i} x={wPage * ((i + 0.5) / cols) - 2} y={140} width={4} height={H - 280} fill="#B33A2A" opacity={0.25} />
+      ))}
+      {/* めくれの影 */}
+      <rect x={Math.max(0, wPage - 60)} y={0} width={60} height={H} fill="#000" opacity={0.12 * (1 - t)} />
+      <rect x={wPage} y={0} width={30} height={H} fill="#000" opacity={0.18 * Math.sin(t * Math.PI)} />
+    </g>
+  );
+};
 
 /** 稲荷山鉄剣の銘文の文字がかすかに漂う（雄略回） */
 const GLYPHS = [..."辛亥年七月中記乎獲居臣上祖名意富比垝獲加多支鹵大王寺在斯鬼宮時吾左治天下令作此百練利刀"];

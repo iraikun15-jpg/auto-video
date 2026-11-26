@@ -16,7 +16,7 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 
 ## 自動公開（.github/workflows/render.yml）
 - push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- `video.mp4` は現在「雄略」Short の結合版（`yuryaku_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- `video.mp4` は現在「卑弥呼」Short の結合版（`himiko_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -80,6 +80,15 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - 判定は「実在が証明された最も古い天皇」の2行の判子＋金の「証明」（崇神の「有力」より一段確か）
 - BGM は木琴風の撥音（陽旋法）＋温かい持続和音（`scripts/synth-yuryaku.mjs`）。効果音は X 線スキャン・銘文のきらめき・判子・クリック。全体 -28.5 LUFS
 - 書き出し済みのファイルで確認だけやり直すときは `SKIP_RENDER=1 node scripts/render-yuryaku.mjs`（草薙剣回も同じ）
+
+### 第6本「卑弥呼は実在したのか」（`src/himiko/`、`npm run render:himiko`、公開予定 2026-12-01 19:00）
+- 舞台は「中国の史書の中の日本」。**邪馬台国の場所には触れない**（地域対立でコメントが荒れるため。地図も出さない。判定で「場所は謎」と添えるだけ）
+- **新しいフック型**（依頼者の要望）：冒頭0フレーム目から大きなテロップ「教科書では教えてくれない女王」を叩きつけ、0秒に拍子木＋太鼓の一打。約1.7秒で上へ退き、「日本の歴史書に名前がない」の判子。今後の回もこの型を使う可能性が高い
+- 部品は `src/himiko/parts.tsx`：線装本 `Book`（『魏志倭人伝』の実際の一節、卑彌呼を光らせる、burn で下から焦げて消える）、銅鏡 `Mirror`（100枚の格子）、金印 `GoldSeal` と印影 `SealPrint`（親魏倭王）、魏の宮殿、塚 `Mound`（殉葬の影の列）、虫めがね
+- 主役は翡翠の深緑の影絵＋金のふち（`kind="himiko"`：長い髪・玉の髪帯・裾までの衣・勾玉）。`Stage look="himiko"` で銅鏡のきらめきが漂い、場面転換は線装本のページめくり。見出し札は朱に白文字
+- 判定は「中国の公式記録に残る / 実在が濃厚な女王」の2行の判子＋金の「濃厚」
+- BGM は古琴風の撥弦（D の宮調）＋簫風の笛（`scripts/synth-himiko.mjs`）。効果音は冒頭フック・ページめくり・判子・銅鏡の鈴・クリック。全体 -28.3 LUFS
+- 人物の白ぬき不具合を修正済み：`Person` の `outline` は `color` 未指定なら各 kind の既定色（ヤマトタケルは白）
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない

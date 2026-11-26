@@ -22,7 +22,7 @@ const Bar: React.FC<{ x: number; y: number; len: number; deg: number; w: number;
   </g>
 );
 
-export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk" | "yuryaku";
+export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk" | "yuryaku" | "himiko";
 
 export const Person: React.FC<{
   kind: PersonKind;
@@ -53,7 +53,7 @@ export const Person: React.FC<{
     return (
       <g opacity={opacity} filter={filter}>
         <PersonBody {...props} color={props.outlineColor ?? SUMI} strokeW={16} />
-        <PersonBody {...props} color={color ?? PAPER} />
+        <PersonBody {...props} color={color} />
       </g>
     );
   }
@@ -70,7 +70,7 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
 }) => {
   // 弓を引くときは前の腕を水平近くまで上げる
   const arm = arm0 + (80 - arm0) * draw;
-  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : kind === "yuryaku" ? "#5A3424" : SHU);
+  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : kind === "yuryaku" ? "#5A3424" : kind === "himiko" ? "#2F5D50" : SHU);
   const tall = kind === "nagasune";
   // 長髄彦は「すねが長い」ので下腿を長く
   const legs: Limb = { hipX: 0, thigh: tall ? 120 : 110, shin: tall ? 200 : 120, w: tall ? 44 : 52 };
@@ -101,7 +101,12 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
       strokeLinejoin="round"
     >
       {/* 後ろ足 */}
-      {leg(sw, knee, "b")}
+      {kind === "himiko" ? (
+        // 裾まで届く衣（脚は隠れる）
+        <path d={`M-58,${hipY - 40} Q-110,${hipY + 120} -150,-4 L150,-4 Q110,${hipY + 120} 62,${hipY - 40}Z`} fill={fill} />
+      ) : (
+        leg(sw, knee, "b")
+      )}
       <g transform={`rotate(${lean},0,${hipY})`}>
         {/* 後ろの腕 */}
         <Bar x={-6} y={shoulderY + 20} len={120} deg={(walk === undefined ? 12 : -sw * 0.8 + 8) * (1 - draw) + 84 * draw} w={36} fill={fill}>
@@ -126,7 +131,20 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
         <circle cx={6} cy={shoulderY - 40 - headR * 0.8} r={headR} fill={fill} />
         {/* 鼻・あご（横顔の輪郭だけ） */}
         <path d={`M${6 + headR - 6},${shoulderY - 40 - headR * 0.9} L${6 + headR + 14},${shoulderY - 40 - headR * 0.6} L${6 + headR - 4},${shoulderY - 40 - headR * 0.45}Z`} fill={fill} />
-        {kind === "monk" ? null : kind === "susanoo" ? (
+        {kind === "himiko" ? (
+          // 背中まで垂れる長い髪・玉飾りの髪帯・金の勾玉の首飾り
+          <g>
+            <path d={`M${-34},${shoulderY - 40 - headR * 1.4} Q${-110},${shoulderY - 40 - headR * 0.6} ${-96},${shoulderY + 160} L${-40},${shoulderY + 150} Q${-50},${shoulderY - 20} ${10},${shoulderY - 40 - headR * 1.6}Z`} fill={fill} />
+            <rect x={-46} y={shoulderY - 40 - headR * 1.35} width={104} height={14} rx={6} fill={KIN} />
+            {[-30, 0, 30].map((cx) => (
+              <circle key={cx} cx={cx + 6} cy={shoulderY - 40 - headR * 1.42} r={7} fill="#7FC8B4" />
+            ))}
+            <path d={`M-40,${shoulderY + 8} Q6,${shoulderY + 60} 52,${shoulderY + 8}`} fill="none" stroke={KIN} strokeWidth={5} />
+            {[-20, 6, 32].map((cx) => (
+              <path key={cx} d={`M${cx},${shoulderY + 34} q10,-4 8,10 q-4,12 -12,4`} fill={KIN} />
+            ))}
+          </g>
+        ) : kind === "monk" ? null : kind === "susanoo" ? (
           // 荒ぶる長い髪（後ろへなびく筋）
           <g fill="none" stroke={fill} strokeLinecap="round">
             {[0, 1, 2, 3, 4].map((k) => (
@@ -210,7 +228,7 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
         </Bar>
       </g>
       {/* 前足 */}
-      {leg(-sw, knee2, "f")}
+      {kind === "himiko" ? null : leg(-sw, knee2, "f")}
     </g>
   );
 };

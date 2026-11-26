@@ -20,6 +20,9 @@ import { TOTAL_FRAMES as KUSANAGI_FRAMES } from "./kusanagi/events";
 import { Yuryaku } from "./yuryaku/Yuryaku";
 import { YuryakuThumbnail } from "./yuryaku/Thumbnail";
 import { TOTAL_FRAMES as YURYAKU_FRAMES } from "./yuryaku/events";
+import { Himiko } from "./himiko/Himiko";
+import { HimikoThumbnail } from "./himiko/Thumbnail";
+import { TOTAL_FRAMES as HIMIKO_FRAMES } from "./himiko/events";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -99,6 +102,10 @@ export const RemotionRoot: React.FC = () => {
       {/* もしも日本史ラボ 第5本「雄略天皇は実在したのか」（BGM・効果音入り） */}
       <Composition id="Yuryaku" component={Yuryaku} width={1080} height={1920} fps={30} durationInFrames={YURYAKU_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="YuryakuThumbnail" component={YuryakuThumbnail} width={1080} height={1920} />
+
+      {/* もしも日本史ラボ 第6本「卑弥呼は実在したのか」（BGM・効果音入り） */}
+      <Composition id="Himiko" component={Himiko} width={1080} height={1920} fps={30} durationInFrames={HIMIKO_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="HimikoThumbnail" component={HimikoThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition
