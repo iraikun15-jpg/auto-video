@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo" | "suiko"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
   const dark = night ?? (look === "kusanagi" ? 1 : 0);
@@ -80,8 +80,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : look === "suiko" ? <LotusPetals f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : look === "suiko" ? <KaniIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
@@ -113,6 +113,46 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** 蓮の花びらがひらひら舞い落ちる（推古回：仏教が栄えた飛鳥の時代） */
+const LotusPetals: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 9 }, (_, i) => {
+      const speed = 0.5 + random(`lp${i}`) * 0.7;
+      const y = ((random(`lpy${i}`) * (H + 300) + f * speed) % (H + 300)) - 150;
+      const x = random(`lpx${i}`) * W + Math.sin(f * 0.025 + i * 1.7) * 60;
+      const flip = Math.cos(f * 0.05 + i);
+      return (
+        <g key={i} transform={`translate(${x},${y}) rotate(${f * 0.8 + i * 40}) scale(${0.4 + Math.abs(flip) * 0.6},1)`} opacity={0.7}>
+          <path d="M0,-30 Q18,-6 0,26 Q-18,-6 0,-30Z" fill="#F2C6CC" />
+          <path d="M0,-24 L0,20" stroke="#D99AA6" strokeWidth={2} />
+        </g>
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：冠位十二階の6色の帯が縦に並んで画面を覆い、上下へ流れ去る（推古回） */
+const KaniIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 16, Easing.in(Easing.cubic));
+  if (t >= 1) return null;
+  const cols = ["#5E3C78", "#2F5D8A", "#C2412D", "#D9B03A", "#F2EEE4", "#211D1A"];
+  const w = W / cols.length;
+  return (
+    <g>
+      {cols.map((c, i) => {
+        const dir = i % 2 ? 1 : -1;
+        const off = dir * t * (H + 200) * (0.8 + i * 0.06);
+        return (
+          <g key={i} transform={`translate(0,${off})`}>
+            <rect x={i * w - 1} y={-40} width={w + 2} height={H + 80} fill={c} />
+            <rect x={i * w + w / 2 - 3} y={-40} width={6} height={H + 80} fill={KIN} opacity={0.5} />
+          </g>
+        );
+      })}
+    </g>
+  );
+};
 
 /** 切り絵の雲（丸みの連なり）。x,y は左端、w は幅 */
 export const CloudShape: React.FC<{ x: number; y: number; w: number; color?: string; opacity?: number }> = ({ x, y, w, color = "#F4EEE0", opacity = 1 }) => {
