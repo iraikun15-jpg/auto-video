@@ -25,10 +25,13 @@ const run = (cmd, args, opts = {}) => execFileSync(cmd, args, { stdio: "inherit"
 const CONCURRENCY = process.env.KUSANAGI_CONCURRENCY ?? "1";
 
 // ---- 音を合成して、映像と一緒に書き出す ----
-run("node", ["scripts/synth-kusanagi.mjs"]);
-run("npx", ["remotion", "render", "src/index.ts", "Kusanagi", `${OUT}/kusanagi_full.mp4`, "--codec=h264", "--audio-codec=aac", "--log=warn", `--concurrency=${CONCURRENCY}`]);
-run("npx", ["remotion", "still", "src/index.ts", "KusanagiThumbnail", `${OUT}/kusanagi_thumbnail.png`, "--log=warn"]);
-run("ffmpeg", ["-loglevel", "error", "-y", "-i", `${OUT}/kusanagi_full.mp4`, "-c:v", "libx264", "-crf", "24", "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", `${OUT}/kusanagi_full_light.mp4`]);
+// SKIP_RENDER=1 なら書き出し済みのファイルで確認とタイミング表だけやり直す
+if (!process.env.SKIP_RENDER) {
+  run("node", ["scripts/synth-kusanagi.mjs"]);
+  run("npx", ["remotion", "render", "src/index.ts", "Kusanagi", `${OUT}/kusanagi_full.mp4`, "--codec=h264", "--audio-codec=aac", "--log=warn", `--concurrency=${CONCURRENCY}`]);
+  run("npx", ["remotion", "still", "src/index.ts", "KusanagiThumbnail", `${OUT}/kusanagi_thumbnail.png`, "--log=warn"]);
+  run("ffmpeg", ["-loglevel", "error", "-y", "-i", `${OUT}/kusanagi_full.mp4`, "-c:v", "libx264", "-crf", "24", "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", `${OUT}/kusanagi_full_light.mp4`]);
+}
 
 // ---- 確認 ----
 const probe = (file) => {
@@ -115,7 +118,7 @@ ${rows.join("\n")}
 |---|---|
 ${sfx.join("\n")}
 
-（確認：絵が急に変わったのは ${changes.map((f) => sec(f)).join("・")} 秒＝場面の境目のみ）
+（確認：絵が急に変わったのは ${changes.map((f) => sec(f)).join("・")} 秒＝場面の境目と剣の一閃（画面が光る演出）のみ）
 `;
 writeFileSync(`${OUT}/kusanagi_timing.md`, md);
 console.log(md);
