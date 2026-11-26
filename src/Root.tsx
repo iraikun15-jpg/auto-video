@@ -11,6 +11,9 @@ import { JimmuThumbnail } from "./jimmu/Thumbnail";
 import { Takeru } from "./takeru/Takeru";
 import { TakeruThumbnail } from "./takeru/Thumbnail";
 import { TOTAL_FRAMES as TAKERU_FRAMES } from "./takeru/events";
+import { Sujin } from "./sujin/Sujin";
+import { SujinThumbnail } from "./sujin/Thumbnail";
+import { TOTAL_FRAMES as SUJIN_FRAMES } from "./sujin/events";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -78,6 +81,10 @@ export const RemotionRoot: React.FC = () => {
       {/* もしも日本史ラボ 第2本「ヤマトタケルは実在したのか」（BGM・効果音入り） */}
       <Composition id="Takeru" component={Takeru} width={1080} height={1920} fps={30} durationInFrames={TAKERU_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="TakeruThumbnail" component={TakeruThumbnail} width={1080} height={1920} />
+
+      {/* もしも日本史ラボ 第3本「本当の初代天皇は崇神？」（BGM・効果音入り） */}
+      <Composition id="Sujin" component={Sujin} width={1080} height={1920} fps={30} durationInFrames={SUJIN_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="SujinThumbnail" component={SujinThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition

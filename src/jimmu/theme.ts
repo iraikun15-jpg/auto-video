@@ -12,6 +12,8 @@ export const AI_LIGHT = "#3E5E80"; // 海の波模様
 export const KIN = "#C99A3E"; // 金（日輪・差し色）
 export const KUSA = "#7A845A"; // 山の緑
 export const HAI = "#8B7E6A"; // その他の豪族の駒
+export const MURASAKI = "#5E3C78"; // 紫（崇神回の主役・見出し）
+export const SUGI = "#4F6B3A"; // 杉の緑（崇神回）
 
 const mincho = loadMincho("normal", {
   weights: ["800"],

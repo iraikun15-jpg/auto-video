@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Easing, Img, interpolate, random, staticFile } from "remotion";
 import { Cam, LANDS, LL, partial, polyPath, project } from "./geo";
-import { AI, AI_LIGHT, H, KIN, MINCHO, PAPER, PAPER_BG, SANS, SHU, SUMI, W } from "./theme";
+import { AI, AI_LIGHT, H, KIN, MINCHO, MURASAKI, PAPER, PAPER_BG, SANS, SHU, SUGI, SUMI, W } from "./theme";
 
 // ---------- 時間の補助 ----------
 export const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物
+  look?: "jimmu" | "takeru" | "sujin"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu" }) => (
   <AbsoluteFill style={{ backgroundColor: PAPER_BG }}>
     <Img src={staticFile("jimmu/washi_bg.jpg")} style={{ position: "absolute", width: W, height: H }} />
@@ -67,8 +67,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: 0.6 }} />
   </AbsoluteFill>
@@ -99,6 +99,52 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** ゆっくり舞い落ちる杉の葉（崇神回：三輪の神杉にちなむ） */
+const SugiLeaves: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 9 }, (_, i) => {
+      const speed = 0.6 + random(`sg${i}`) * 0.8;
+      const y = ((random(`sy${i}`) * (H + 300) + f * speed) % (H + 300)) - 150;
+      const x = random(`sx${i}`) * W + Math.sin(f * 0.02 + i * 1.7) * 60;
+      const sc = 0.6 + random(`sr${i}`) * 0.6;
+      const rot = f * (0.6 + (i % 3) * 0.3) + i * 50;
+      return (
+        <g key={i} transform={`translate(${x},${y}) rotate(${rot}) scale(${sc})`} opacity={0.85} stroke={SUGI} strokeLinecap="round">
+          <path d="M0,-34 L0,34" strokeWidth={3} />
+          {[-24, -12, 0, 12, 24].map((yy) => (
+            <path key={yy} d={`M0,${yy} L-12,${yy - 9} M0,${yy} L12,${yy - 9}`} strokeWidth={3} />
+          ))}
+        </g>
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：竹の御簾（みす）が上へ巻き上がり、次の場面が現れる（崇神回） */
+const MisuIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
+  if (t >= 1) return null;
+  const bottom = H * (1 - t);
+  const slats = Math.ceil(bottom / 22);
+  return (
+    <g>
+      <g filter="url(#paper)">
+        <rect x={0} y={0} width={W} height={bottom} fill="#C9B27E" />
+      </g>
+      {Array.from({ length: slats }, (_, i) => (
+        <rect key={i} x={0} y={i * 22} width={W} height={3} fill="#8A7346" opacity={0.6} />
+      ))}
+      {/* 縦の綴じ糸 */}
+      {[180, 540, 900].map((x) => (
+        <rect key={x} x={x - 3} y={0} width={6} height={bottom} fill={MURASAKI} opacity={0.75} />
+      ))}
+      {/* 巻き上がった部分と紫の縁 */}
+      <rect x={0} y={bottom - 34} width={W} height={34} rx={14} fill="#A88F5C" />
+      <rect x={0} y={bottom - 6} width={W} height={10} fill={MURASAKI} />
+    </g>
+  );
+};
 
 /** ゆっくり舞い落ちる白い羽根（ヤマトタケル回：白鳥伝説にちなむ） */
 const Feathers: React.FC<{ f: number }> = ({ f }) => (
@@ -293,8 +339,8 @@ export const PlaceLabel: React.FC<{ x: number; y: number; text: string; t?: numb
 };
 
 // ---------- 駒 ----------
-export type TokenKind = "jimmu" | "enemy" | "clan" | "itsuse" | "takeru";
-const TOKEN_COLORS: Record<TokenKind, string> = { jimmu: SHU, enemy: SUMI, clan: "#7d6b55", itsuse: SHU, takeru: PAPER };
+export type TokenKind = "jimmu" | "enemy" | "clan" | "itsuse" | "takeru" | "sujin";
+const TOKEN_COLORS: Record<TokenKind, string> = { jimmu: SHU, enemy: SUMI, clan: "#7d6b55", itsuse: SHU, takeru: PAPER, sujin: MURASAKI };
 
 /** 作戦盤の駒（丸い紙）。神武方は日輪、敵方は矛 */
 export const Token: React.FC<{ x: number; y: number; kind: TokenKind; r?: number; t?: number; label?: string; rot?: number }> = ({
@@ -314,7 +360,13 @@ export const Token: React.FC<{ x: number; y: number; kind: TokenKind; r?: number
         <circle r={r} fill={TOKEN_COLORS[kind]} stroke={kind === "takeru" ? SUMI : undefined} strokeWidth={kind === "takeru" ? r * 0.12 : undefined} />
       </g>
       <circle r={r * 0.82} fill="none" stroke={kind === "takeru" ? SUMI : PAPER} strokeWidth={r * 0.07} opacity={0.75} />
-      {kind === "takeru" ? (
+      {kind === "sujin" ? (
+        // 紫の駒に金の冠
+        <g fill={KIN}>
+          <rect x={-r * 0.3} y={-r * 0.42} width={r * 0.6} height={r * 0.5} rx={r * 0.08} />
+          <rect x={-r * 0.48} y={r * 0.08} width={r * 0.96} height={r * 0.16} rx={r * 0.06} />
+        </g>
+      ) : kind === "takeru" ? (
         // 白い駒に墨の剣
         <g fill={SUMI}>
           <path d={`M0,${-r * 0.66} L${r * 0.1},${-r * 0.5} L${r * 0.1},${r * 0.22} L${-r * 0.1},${r * 0.22} L${-r * 0.1},${-r * 0.5}Z`} />

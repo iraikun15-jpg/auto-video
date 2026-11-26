@@ -9,7 +9,8 @@
     "render:sample": "remotion render src/index.ts ShortVideo out/video.mp4 --codec=h264",
     "typecheck": "tsc --noEmit",
     "render:jimmu": "node scripts/render-jimmu.mjs",
-    "render:takeru": "node scripts/render-takeru.mjs"
+    "render:takeru": "node scripts/render-takeru.mjs",
+    "render:sujin": "node scripts/render-sujin.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",

@@ -1,5 +1,5 @@
 import React from "react";
-import { KIN, PAPER, SHU, SUMI } from "./theme";
+import { KIN, MURASAKI, PAPER, SHU, SUMI } from "./theme";
 
 // 影絵（切り絵）の人物。顔は描かず、輪郭だけで人物を表す（断定画にしない）。
 // 原点は足元の中央。scale=1 で身長およそ 600px。右向きが基本、flip で左向き。
@@ -22,7 +22,7 @@ const Bar: React.FC<{ x: number; y: number; len: number; deg: number; w: number;
   </g>
 );
 
-export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru";
+export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin";
 
 export const Person: React.FC<{
   kind: PersonKind;
@@ -69,7 +69,7 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
 }) => {
   // 弓を引くときは前の腕を水平近くまで上げる
   const arm = arm0 + (80 - arm0) * draw;
-  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : SHU);
+  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : SHU);
   const tall = kind === "nagasune";
   // 長髄彦は「すねが長い」ので下腿を長く
   const legs: Limb = { hipX: 0, thigh: tall ? 120 : 110, shin: tall ? 200 : 120, w: tall ? 44 : 52 };
@@ -125,7 +125,15 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
         <circle cx={6} cy={shoulderY - 40 - headR * 0.8} r={headR} fill={fill} />
         {/* 鼻・あご（横顔の輪郭だけ） */}
         <path d={`M${6 + headR - 6},${shoulderY - 40 - headR * 0.9} L${6 + headR + 14},${shoulderY - 40 - headR * 0.6} L${6 + headR - 4},${shoulderY - 40 - headR * 0.45}Z`} fill={fill} />
-        {kind === "nagasune" ? (
+        {kind === "sujin" ? (
+          // 冠（箱形の冠に後ろへ垂れる纓）
+          <g>
+            <rect x={-30} y={shoulderY - 40 - headR * 1.95} width={62} height={headR * 0.95} rx={8} fill={fill} />
+            <rect x={-50} y={shoulderY - 40 - headR * 1.15} width={104} height={16} rx={6} fill={fill} />
+            <path d={`M${-26},${shoulderY - 40 - headR * 1.7} Q${-80},${shoulderY - 40 - headR * 1.4} ${-70},${shoulderY - 40 - headR * 0.4}`} fill="none" stroke={fill} strokeWidth={12} strokeLinecap="round" />
+            <rect x={-30} y={shoulderY - 40 - headR * 1.25} width={62} height={7} fill={KIN} opacity={0.85} />
+          </g>
+        ) : kind === "nagasune" ? (
           // 冠り物（とがった帽子）
           <path d={`M${-44},${shoulderY - 40 - headR * 1.2} L${60},${shoulderY - 40 - headR * 1.25} L${-10},${shoulderY - 40 - headR * 2.6}Z`} fill={fill} />
         ) : (
@@ -155,6 +163,12 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
               <g transform={`rotate(${arm + 30 + spearTilt})`}>
                 <rect x={-9} y={-470} width={18} height={720} fill={fill} />
                 <path d="M0,-560 L26,-470 L-26,-470Z" fill={fill} />
+              </g>
+            ) : kind === "sujin" ? (
+              // 笏（しゃく）
+              <g transform={`rotate(${arm + 30 + spearTilt})`}>
+                <rect x={-11} y={-150} width={22} height={170} rx={9} fill={fill} />
+                <rect x={-11} y={-150} width={22} height={170} rx={9} fill="none" stroke={KIN} strokeWidth={3} opacity={0.7} />
               </g>
             ) : kind === "takeru" ? (
               // 剣（spearTilt で傾ける。負で前へ振り下ろす）

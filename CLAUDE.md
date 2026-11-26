@@ -16,7 +16,7 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 
 ## 自動公開（.github/workflows/render.yml）
 - push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- `video.mp4` は現在「ヤマトタケル」Short の結合版（`takeru_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- `video.mp4` は現在「崇神」Short の結合版（`sujin_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -53,6 +53,16 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
   - 場面の長さ・判子のフレーム・クリックのフレームは `src/takeru/events.ts` が正本。映像と音の両方がここを読む
 - 締めの順番は依頼者と相談して「二択（seg8）→ 登録エンドカード（seg9）」。台本の 8 と 9 は入れ替えて読む
 - 納品: 結合版（音あり）・軽量版・サムネ・タイミング表（場面の開始秒＋効果音の位置）。`render-takeru.mjs` がフレーム数・音声トラック・壊れたフレーム・ピークを自動確認する
+
+### 第3本「本当の初代天皇は崇神？」（`src/sujin/`、`npm run render:sujin`）
+- 舞台は大和（奈良盆地）。様式化した地図 `src/sujin/yamato.tsx`（盆地・三輪山・行燈山古墳（前方後円墳）・宮・笠縫邑・田・集落・注連縄）。四道将軍の場面だけ第2本の広域地図を使う
+- 依頼者は回ごとの「オリジナリティ」を重視（第2本で「神武と似すぎ」と指摘された）。指示書の維持事項は守りつつ、回ごとに次を変える：
+  - 主役の色：神武=朱／ヤマトタケル=白＋墨のふち／崇神=紫（冠と笏、`kind="sujin"`）
+  - 舞うもの・場面転換（`Stage` の `look`）：jimmu=金の小片＋紙めくり／takeru=白い羽根＋巻物／sujin=杉の葉＋御簾
+  - 地図の飾り：takeru=金の霞／sujin=注連縄と紙垂。見出し札：takeru=藍／sujin=紫
+  - 判定のトーン：神武=人物は神話、ヤマトタケル=人物は合成、崇神=「実在した可能性のある最初の天皇」（2行の二重枠の朱判子＋金の「有力」）
+- BGM は笙風の和音＋律旋法（D・E・G・A・B）の箏（`scripts/synth-sujin.mjs`）。転換音は竹の御簾のカラカラ音。全体 -28.6 LUFS・ピーク -6 dB
+- 場面の並びは台本どおり（判定 → 二択 → 登録）
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない
