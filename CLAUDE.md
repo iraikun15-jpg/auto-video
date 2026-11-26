@@ -6,16 +6,17 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - 返答はすべて日本語
 - 依頼は「指示ファイル（.md）」で来ることが多い。禁止事項・維持事項・納品物の指定に厳密に従う
 - **投稿・予約は絶対にしない**。完成品を返すだけ
-- 完成したら、ファイルをチャットに送り、Releases の直リンクも伝える（依頼者は「リンクください」とよく言う）
-- 開発ブランチ: `claude/busy-goldberg-3yt680`（push すると Actions が自動で動く）
+- 完成したら、ファイルをチャットに送る（軽量版・サムネ・タイミング表・高画質版）。依頼者は iPhone で指示し、PC で保存している
+- **GitHub での書き出し・Releases は不要**（依頼者の指示 2026-11-26）。push しても Actions は動かない（手動実行のみ）。Release の確認やリンクの案内もしない
+- 開発ブランチ: `claude/friendly-babbage-c7o0dj`
 
 ## 環境の注意
 - GPU なし。3D は `--gl=swangle` で書き出す
 - ローカルでは Chromium のダウンロードが塞がれているので、`--browser-executable=/opt/pw-browsers/chromium` か環境変数 `REMOTION_BROWSER` を使う
 - フォントは `@remotion/google-fonts` の Noto Sans JP（weight 900）
 
-## 自動公開（.github/workflows/render.yml）
-- push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
+## 書き出しの Actions（.github/workflows/render.yml）
+- **手動実行のみ**（push では動かない）。実行すると全シリーズを書き出して `video-<実行番号>` の Release を作る（約50分）
 - `video.mp4` は現在「出雲」Short の結合版（`izumo_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
@@ -128,7 +129,6 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
   - 書き出した mp4 から連続フレームを切り出して目で見る
   - **サムネイルも必ず開いて目で見る**（神武で、場面転換の紙めくりがサムネに被って画面が隠れたまま渡してしまった）
 - 重い SVG フィルタ（feTurbulence・feDisplacementMap を画面全体や多数の部品に掛ける）は使わない。質感は画像にして貼る
-- Release のリンクは、Actions が終わって Release ができたのを確認してから伝える
 - 書き出したら ffprobe で解像度・フレーム数・音声トラックの有無を確認する
 - 音ありは `ffmpeg -af ebur128=peak=true` でラウドネスとピークを測る
 - 静止画を何枚か書き出して、見た目を目で確認してから本番レンダリングする

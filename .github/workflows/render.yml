@@ -1,9 +1,8 @@
 name: Render video
 
+# 依頼者はチャットで受け取った動画を PC に保存する運用なので、push での自動書き出しはしない。
+# 必要なときだけ GitHub の Actions 画面から手動で実行する。
 on:
-  push:
-    paths-ignore:
-      - "**.md"
   workflow_dispatch:
 
 permissions:
