@@ -22,7 +22,7 @@ const Bar: React.FC<{ x: number; y: number; len: number; deg: number; w: number;
   </g>
 );
 
-export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk";
+export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk" | "yuryaku";
 
 export const Person: React.FC<{
   kind: PersonKind;
@@ -70,7 +70,7 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
 }) => {
   // 弓を引くときは前の腕を水平近くまで上げる
   const arm = arm0 + (80 - arm0) * draw;
-  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : SHU);
+  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : kind === "yuryaku" ? "#5A3424" : SHU);
   const tall = kind === "nagasune";
   // 長髄彦は「すねが長い」ので下腿を長く
   const legs: Limb = { hipX: 0, thigh: tall ? 120 : 110, shin: tall ? 200 : 120, w: tall ? 44 : 52 };
@@ -138,6 +138,15 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
             ))}
             <path d={`M${-36},${shoulderY - 40 - headR * 1.3} Q${6},${shoulderY - 40 - headR * 2.0} ${48},${shoulderY - 40 - headR * 1.38}`} strokeWidth={22} />
           </g>
+        ) : kind === "yuryaku" ? (
+          // 金銅の冠（古墳時代の大王：帯に立ち飾りが並ぶ）
+          <g>
+            <rect x={-56} y={shoulderY - 40 - headR * 1.3} width={116} height={22} rx={4} fill={KIN} />
+            {[-44, -14, 16, 46].map((cx, k) => (
+              <path key={k} d={`M${cx - 9},${shoulderY - 40 - headR * 1.3} L${cx},${shoulderY - 40 - headR * (2.05 + (k % 2) * 0.2)} L${cx + 9},${shoulderY - 40 - headR * 1.3}Z`} fill={KIN} />
+            ))}
+            <circle cx={2} cy={shoulderY - 40 - headR * 1.19} r={5} fill={SHU} />
+          </g>
         ) : kind === "sujin" ? (
           // 冠（箱形の冠に後ろへ垂れる纓）
           <g>
@@ -183,7 +192,7 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
                 <rect x={-11} y={-150} width={22} height={170} rx={9} fill={fill} />
                 <rect x={-11} y={-150} width={22} height={170} rx={9} fill="none" stroke={KIN} strokeWidth={3} opacity={0.7} />
               </g>
-            ) : kind === "takeru" || kind === "susanoo" ? (
+            ) : kind === "takeru" || kind === "susanoo" || kind === "yuryaku" ? (
               // 剣（spearTilt で傾ける。負で前へ振り下ろす）
               <g transform={`rotate(${arm + 30 + spearTilt})`}>
                 <rect x={-26} y={-18} width={52} height={14} rx={5} fill={fill} />

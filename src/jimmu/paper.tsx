@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
   const dark = night ?? (look === "kusanagi" ? 1 : 0);
@@ -80,8 +80,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
@@ -113,6 +113,45 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** 稲荷山鉄剣の銘文の文字がかすかに漂う（雄略回） */
+const GLYPHS = [..."辛亥年七月中記乎獲居臣上祖名意富比垝獲加多支鹵大王寺在斯鬼宮時吾左治天下令作此百練利刀"];
+const FloatingGlyphs: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 12 }, (_, i) => {
+      const speed = 0.35 + random(`gy${i}`) * 0.5;
+      const y = ((random(`gyy${i}`) * (H + 200) + f * speed) % (H + 200)) - 100;
+      const x = random(`gyx${i}`) * W + Math.sin(f * 0.02 + i * 1.9) * 30;
+      const ch = GLYPHS[Math.floor(random(`gyc${i}`) * GLYPHS.length)];
+      return (
+        <text key={i} x={x} y={y} textAnchor="middle" fontFamily={MINCHO} fontWeight={800} fontSize={34 + random(`gys${i}`) * 26} fill={KIN} opacity={0.22 + 0.1 * Math.sin(f * 0.06 + i)}>
+          {ch}
+        </text>
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：X線のスキャン光が上から下へ走り、光の通ったあとに次の場面が現れる（雄略回） */
+const XrayIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
+  if (t >= 1) return null;
+  const y = -40 + t * (H + 80);
+  return (
+    <g>
+      <rect x={0} y={y} width={W} height={H - y + 40} fill="#0C1A2A" />
+      {Array.from({ length: 12 }, (_, i) => (
+        <rect key={i} x={0} y={y + i * 160} width={W} height={2} fill="#7FD3FF" opacity={0.18} />
+      ))}
+      {Array.from({ length: 9 }, (_, i) => (
+        <rect key={`v${i}`} x={i * 135} y={y} width={2} height={H - y + 40} fill="#7FD3FF" opacity={0.12} />
+      ))}
+      <rect x={0} y={y - 70} width={W} height={70} fill="#7FD3FF" opacity={0.18} />
+      <rect x={0} y={y - 14} width={W} height={14} fill="#BFEFFF" opacity={0.7} />
+      <rect x={0} y={y - 3} width={W} height={4} fill="#FFFFFF" />
+    </g>
+  );
+};
 
 /** 蛍火のような光の粒がゆっくり昇る（草薙剣回） */
 const Motes: React.FC<{ f: number }> = ({ f }) => (

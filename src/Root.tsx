@@ -17,6 +17,9 @@ import { TOTAL_FRAMES as SUJIN_FRAMES } from "./sujin/events";
 import { Kusanagi } from "./kusanagi/Kusanagi";
 import { KusanagiThumbnail } from "./kusanagi/Thumbnail";
 import { TOTAL_FRAMES as KUSANAGI_FRAMES } from "./kusanagi/events";
+import { Yuryaku } from "./yuryaku/Yuryaku";
+import { YuryakuThumbnail } from "./yuryaku/Thumbnail";
+import { TOTAL_FRAMES as YURYAKU_FRAMES } from "./yuryaku/events";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -92,6 +95,10 @@ export const RemotionRoot: React.FC = () => {
       {/* もしも日本史ラボ 第4本「草薙剣は本当にあったのか」（神話ファンタジー寄り・BGM・効果音入り） */}
       <Composition id="Kusanagi" component={Kusanagi} width={1080} height={1920} fps={30} durationInFrames={KUSANAGI_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="KusanagiThumbnail" component={KusanagiThumbnail} width={1080} height={1920} />
+
+      {/* もしも日本史ラボ 第5本「雄略天皇は実在したのか」（BGM・効果音入り） */}
+      <Composition id="Yuryaku" component={Yuryaku} width={1080} height={1920} fps={30} durationInFrames={YURYAKU_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="YuryakuThumbnail" component={YuryakuThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition

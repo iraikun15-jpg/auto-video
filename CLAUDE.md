@@ -16,7 +16,7 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 
 ## 自動公開（.github/workflows/render.yml）
 - push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- `video.mp4` は現在「草薙剣」Short の結合版（`kusanagi_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- `video.mp4` は現在「雄略」Short の結合版（`yuryaku_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -72,6 +72,14 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - **判定の判子は使わない**。最後は「これはあった？ なかった？」の二択で開いて終わる。熱田の剣は画面文字で断定しない（「祀られているとされる」まで）
 - BGM は浮遊感のある持続和音（D のリディア風）＋ガラスの鈴（FM 合成）＋深い低音（`scripts/synth-kusanagi.mjs`）。効果音は剣閃（風切り＋金属の響き）・判子・不開門が閉まる音・クリック。全体 -27.5 LUFS
 - 剣の一閃（`events.ts` の `SLASHES`）は画面全体が光るので、壊れたフレームの自動チェックでは除外している
+
+### 第5本「雄略天皇は実在したのか」（`src/yuryaku/`、`npm run render:yuryaku`、公開予定 2026-11-30 19:00）
+- 主役は「証拠の鉄剣」。テーマは発掘調査と X 線鑑定。`Stage look="yuryaku"` で銘文の漢字がかすかに漂い、場面転換は X 線のスキャン光
+- 部品は `src/yuryaku/parts.tsx`：鉄剣 `IronSword`（錆びた鉄 ⇄ X線写真、銘文が上から現れる・大王名を光らせる）、銘文 `MEI_FRONT`/`MEI_BACK`（稲荷山鉄剣の実際の115字。裏面26字目から「獲加多支鹵大王」）、証拠の階段 `EvidenceStairs`（神武=神話→崇神=可能性→雄略=証明）、三方向の一致 `Triad`、年表 `Timeline`、発掘の方眼 `SurveyGrid`
+- 主役の色は鉄錆色に金銅の冠（`kind="yuryaku"`）。見出し札は鉄錆色に金の文字
+- 判定は「実在が証明された最も古い天皇」の2行の判子＋金の「証明」（崇神の「有力」より一段確か）
+- BGM は木琴風の撥音（陽旋法）＋温かい持続和音（`scripts/synth-yuryaku.mjs`）。効果音は X 線スキャン・銘文のきらめき・判子・クリック。全体 -28.5 LUFS
+- 書き出し済みのファイルで確認だけやり直すときは `SKIP_RENDER=1 node scripts/render-yuryaku.mjs`（草薙剣回も同じ）
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない

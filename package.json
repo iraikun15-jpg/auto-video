@@ -11,7 +11,8 @@
     "render:jimmu": "node scripts/render-jimmu.mjs",
     "render:takeru": "node scripts/render-takeru.mjs",
     "render:sujin": "node scripts/render-sujin.mjs",
-    "render:kusanagi": "node scripts/render-kusanagi.mjs"
+    "render:kusanagi": "node scripts/render-kusanagi.mjs",
+    "render:yuryaku": "node scripts/render-yuryaku.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",
