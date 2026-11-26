@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
   const dark = night ?? (look === "kusanagi" ? 1 : 0);
@@ -80,8 +80,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
@@ -113,6 +113,51 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** 湖のさざ波：あちこちで淡い波紋が広がって消える（継体回：近江の湖にちなむ） */
+const Ripples: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 7 }, (_, i) => {
+      const period = 120 + Math.floor(random(`rp${i}`) * 80);
+      const ph = (f + i * 37) % period;
+      const cycle = Math.floor((f + i * 37) / period);
+      const x = random(`rx${i}-${cycle}`) * W;
+      const y = 200 + random(`ry${i}-${cycle}`) * (H - 400);
+      const t = ph / period;
+      return (
+        <g key={i} opacity={0.35 * Math.sin(t * Math.PI)}>
+          {[0, 1, 2].map((k) => (
+            <ellipse key={k} cx={x} cy={y} rx={(20 + t * 120) * (1 - k * 0.25)} ry={(8 + t * 40) * (1 - k * 0.25)} fill="none" stroke="#6E8FA8" strokeWidth={2.5} />
+          ))}
+        </g>
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：襖（ふすま）が中央から左右へ開き、次の場面が現れる（継体回） */
+const FusumaIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 16, Easing.inOut(Easing.cubic));
+  if (t >= 1) return null;
+  const half = W / 2;
+  const off = t * (half + 40);
+  const panel = (x: number, key: string) => (
+    <g key={key} transform={`translate(${x},0)`}>
+      <g filter="url(#paper)">
+        <rect x={0} y={0} width={half} height={H} fill="#E9DFC8" />
+      </g>
+      <rect x={0} y={0} width={half} height={H} fill="none" stroke="#3B2A18" strokeWidth={18} />
+      {/* 襖絵：遠山と金の雲 */}
+      <path d={`M0,1300 Q${half * 0.3},1100 ${half * 0.55},1220 Q${half * 0.8},1080 ${half},1180 L${half},1500 L0,1500Z`} fill="#8E9A78" opacity={0.6} />
+      <rect x={40} y={420} width={half - 80} height={40} rx={20} fill={KIN} opacity={0.55} />
+      <rect x={90} y={500} width={half - 200} height={28} rx={14} fill={KIN} opacity={0.4} />
+      {/* 引手 */}
+      <circle cx={x < half ? half - 50 : 50} cy={H / 2} r={22} fill="#3B2A18" />
+      <circle cx={x < half ? half - 50 : 50} cy={H / 2} r={12} fill={KIN} />
+    </g>
+  );
+  return <g>{[panel(-off, "l"), panel(half + off, "r")]}</g>;
+};
 
 /** 小さな銅鏡がくるりと回りながら漂い、ときどき光る（卑弥呼回） */
 const MirrorGlints: React.FC<{ f: number }> = ({ f }) => (

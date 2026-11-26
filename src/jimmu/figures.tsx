@@ -22,7 +22,7 @@ const Bar: React.FC<{ x: number; y: number; len: number; deg: number; w: number;
   </g>
 );
 
-export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk" | "yuryaku" | "himiko";
+export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk" | "yuryaku" | "himiko" | "keitai" | "keitaiKasa";
 
 export const Person: React.FC<{
   kind: PersonKind;
@@ -70,7 +70,7 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
 }) => {
   // 弓を引くときは前の腕を水平近くまで上げる
   const arm = arm0 + (80 - arm0) * draw;
-  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : kind === "yuryaku" ? "#5A3424" : kind === "himiko" ? "#2F5D50" : SHU);
+  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : kind === "yuryaku" ? "#5A3424" : kind === "himiko" ? "#2F5D50" : kind === "keitai" || kind === "keitaiKasa" ? "#B98A2A" : SHU);
   const tall = kind === "nagasune";
   // 長髄彦は「すねが長い」ので下腿を長く
   const legs: Limb = { hipX: 0, thigh: tall ? 120 : 110, shin: tall ? 200 : 120, w: tall ? 44 : 52 };
@@ -131,7 +131,21 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
         <circle cx={6} cy={shoulderY - 40 - headR * 0.8} r={headR} fill={fill} />
         {/* 鼻・あご（横顔の輪郭だけ） */}
         <path d={`M${6 + headR - 6},${shoulderY - 40 - headR * 0.9} L${6 + headR + 14},${shoulderY - 40 - headR * 0.6} L${6 + headR - 4},${shoulderY - 40 - headR * 0.45}Z`} fill={fill} />
-        {kind === "himiko" ? (
+        {kind === "keitaiKasa" ? (
+          // 旅の笠（地方から来た王）
+          <g>
+            <path d={`M${-120},${shoulderY - 40 - headR * 1.05} Q${6},${shoulderY - 40 - headR * 2.5} ${132},${shoulderY - 40 - headR * 1.05} Q${6},${shoulderY - 40 - headR * 1.3} ${-120},${shoulderY - 40 - headR * 1.05}Z`} fill={fill} />
+            <path d={`M${-90},${shoulderY - 40 - headR * 1.15} L${100},${shoulderY - 40 - headR * 1.15}`} stroke={SUMI} strokeWidth={4} opacity={0.4} />
+          </g>
+        ) : kind === "keitai" ? (
+          // 冠（帯に低い立ち飾り）とみずら
+          <g>
+            <rect x={-48} y={shoulderY - 40 - headR * 1.32} width={100} height={18} rx={4} fill={fill} />
+            <path d={`M${-20},${shoulderY - 40 - headR * 1.32} L${6},${shoulderY - 40 - headR * 1.9} L${32},${shoulderY - 40 - headR * 1.32}Z`} fill={fill} />
+            <rect x={-48} y={shoulderY - 40 - headR * 1.24} width={100} height={5} fill={KIN} />
+            <circle cx={-6} cy={shoulderY - 40 - headR * 0.4} r={18} fill="none" stroke={fill} strokeWidth={12} />
+          </g>
+        ) : kind === "himiko" ? (
           // 背中まで垂れる長い髪・玉飾りの髪帯・金の勾玉の首飾り
           <g>
             <path d={`M${-34},${shoulderY - 40 - headR * 1.4} Q${-110},${shoulderY - 40 - headR * 0.6} ${-96},${shoulderY + 160} L${-40},${shoulderY + 150} Q${-50},${shoulderY - 20} ${10},${shoulderY - 40 - headR * 1.6}Z`} fill={fill} />

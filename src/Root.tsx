@@ -23,6 +23,9 @@ import { TOTAL_FRAMES as YURYAKU_FRAMES } from "./yuryaku/events";
 import { Himiko } from "./himiko/Himiko";
 import { HimikoThumbnail } from "./himiko/Thumbnail";
 import { TOTAL_FRAMES as HIMIKO_FRAMES } from "./himiko/events";
+import { Keitai } from "./keitai/Keitai";
+import { KeitaiThumbnail } from "./keitai/Thumbnail";
+import { TOTAL_FRAMES as KEITAI_FRAMES } from "./keitai/events";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -106,6 +109,10 @@ export const RemotionRoot: React.FC = () => {
       {/* もしも日本史ラボ 第6本「卑弥呼は実在したのか」（BGM・効果音入り） */}
       <Composition id="Himiko" component={Himiko} width={1080} height={1920} fps={30} durationInFrames={HIMIKO_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="HimikoThumbnail" component={HimikoThumbnail} width={1080} height={1920} />
+
+      {/* もしも日本史ラボ 第7本「継体天皇は実在したのか」（BGM・効果音入り） */}
+      <Composition id="Keitai" component={Keitai} width={1080} height={1920} fps={30} durationInFrames={KEITAI_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="KeitaiThumbnail" component={KeitaiThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition

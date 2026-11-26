@@ -16,7 +16,7 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 
 ## 自動公開（.github/workflows/render.yml）
 - push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- `video.mp4` は現在「卑弥呼」Short の結合版（`himiko_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- `video.mp4` は現在「継体」Short の結合版（`keitai_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -89,6 +89,14 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - 判定は「中国の公式記録に残る / 実在が濃厚な女王」の2行の判子＋金の「濃厚」
 - BGM は古琴風の撥弦（D の宮調）＋簫風の笛（`scripts/synth-himiko.mjs`）。効果音は冒頭フック・ページめくり・判子・銅鏡の鈴・クリック。全体 -28.3 LUFS
 - 人物の白ぬき不具合を修正済み：`Person` の `outline` は `color` 未指定なら各 kind の既定色（ヤマトタケルは白）
+
+### 第7本「継体天皇は実在したのか」（`src/keitai/`、`npm run render:keitai`、公開予定 2026-12-02 19:00）
+- 依頼者「クオリティを上げていきましょう」：奥行き（遠山・湖・葦の視差）、カメラの寄り、場面ごとの見せ場を増やした
+- フック型：0フレーム目から「実は出自が謎だらけ？」＋拍子木と太鼓。2秒ごろ「本当に天皇家の血筋？」の判子
+- 主役は山吹色の影絵（`kind="keitai"` 冠とみずら／`kind="keitaiKasa"` 旅の笠）。`Stage look="keitai"` で湖のさざ波の波紋、場面転換は襖が左右に開く。見出し札は山吹色に墨
+- 見せ場：近江の湖の風景と都の使い／近江→樟葉宮→筒城宮→弟国宮→磐余玉穂宮を点が進み、年のカウンター（即位・5年目・12年目・20年目）／古い時代の札ほどぼやけ継体で焦点が合う＋527年 磐井の乱／応神から継体への点線の枝に「？」が並ぶ家系図／王朝の鎖が継体で切れる IF／伝承と記録の境目に立つ王
+- 判定は「実在が確実になる / 境目の王」＋金の「確実」＋「ただし出自は謎」
+- BGM は琵琶風の撥弦（都節）＋尺八風の笛（`scripts/synth-keitai.mjs`）。効果音は冒頭フック・襖・判子・宮に着く鈴・クリック。全体 -28.4 LUFS
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない
