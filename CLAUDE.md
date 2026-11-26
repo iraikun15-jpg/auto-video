@@ -16,7 +16,7 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 
 ## 自動公開（.github/workflows/render.yml）
 - push（.md だけの変更は除く）で歴史ch神武・第2話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- `video.mp4` は現在「継体」Short の結合版（`keitai_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- `video.mp4` は現在「出雲」Short の結合版（`izumo_full.mp4` と同じ）。最新の結合版は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -97,6 +97,13 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - 見せ場：近江の湖の風景と都の使い／近江→樟葉宮→筒城宮→弟国宮→磐余玉穂宮を点が進み、年のカウンター（即位・5年目・12年目・20年目）／古い時代の札ほどぼやけ継体で焦点が合う＋527年 磐井の乱／応神から継体への点線の枝に「？」が並ぶ家系図／王朝の鎖が継体で切れる IF／伝承と記録の境目に立つ王
 - 判定は「実在が確実になる / 境目の王」＋金の「確実」＋「ただし出自は謎」
 - BGM は琵琶風の撥弦（都節）＋尺八風の笛（`scripts/synth-keitai.mjs`）。効果音は冒頭フック・襖・判子・宮に着く鈴・クリック。全体 -28.4 LUFS
+
+### 第8本「出雲の国譲りは本当にあったのか」（`src/izumo/`、`npm run render:izumo`、公開予定 2026-12-03 19:00）
+- フック型：0フレーム目から「実は出雲の方が強かった？」＋拍子木と太鼓。2秒ごろ「証拠は地面の下」の判子
+- 主役は大国主命（青銅の緑青色の影絵・背中の大きな袋、`kind="okuninushi"`）。天の使いは `kind="takeru"` に金のふち。`Stage look="izumo"` で八雲（小さな雲）が流れ、場面転換は雲が左右から湧いて流れ去る。見出し札は青銅色に白文字
+- 部品 `src/izumo/parts.tsx`：銅剣 `BronzeSword`（荒神谷の実際の並び 34・111・120 ・93 本の4列）、銅鐸 `Dotaku`（39個）、古代出雲大社 `TallShrine`（高い柱と長い階段）、天秤 `Balance`（対等な交渉）、勢力の円 `PowerCircle`（出雲と大和を同じ大きさで並べる。場所争いにしない）
+- 判定は「交渉は神話」（墨）＋「勢力は実在」（朱）＋金の「遺跡が証明」
+- BGM は神楽の雰囲気（神楽笛風の高い笛・神楽鈴・律旋法の撥弦・低い持続音）（`scripts/synth-izumo.mjs`）。効果音は冒頭フック・雲・土を掘る音・銅剣の金属音・銅鐸・判子・クリック。全体 -27.9 LUFS
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない

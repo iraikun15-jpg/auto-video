@@ -26,6 +26,9 @@ import { TOTAL_FRAMES as HIMIKO_FRAMES } from "./himiko/events";
 import { Keitai } from "./keitai/Keitai";
 import { KeitaiThumbnail } from "./keitai/Thumbnail";
 import { TOTAL_FRAMES as KEITAI_FRAMES } from "./keitai/events";
+import { Izumo } from "./izumo/Izumo";
+import { IzumoThumbnail } from "./izumo/Thumbnail";
+import { TOTAL_FRAMES as IZUMO_FRAMES } from "./izumo/events";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -113,6 +116,10 @@ export const RemotionRoot: React.FC = () => {
       {/* もしも日本史ラボ 第7本「継体天皇は実在したのか」（BGM・効果音入り） */}
       <Composition id="Keitai" component={Keitai} width={1080} height={1920} fps={30} durationInFrames={KEITAI_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="KeitaiThumbnail" component={KeitaiThumbnail} width={1080} height={1920} />
+
+      {/* もしも日本史ラボ 第8本「出雲の国譲りは本当にあったのか」（BGM・効果音入り） */}
+      <Composition id="Izumo" component={Izumo} width={1080} height={1920} fps={30} durationInFrames={IZUMO_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="IzumoThumbnail" component={IzumoThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition

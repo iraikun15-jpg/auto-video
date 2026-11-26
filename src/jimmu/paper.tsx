@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
   const dark = night ?? (look === "kusanagi" ? 1 : 0);
@@ -80,8 +80,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
@@ -113,6 +113,56 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** 切り絵の雲（丸みの連なり）。x,y は左端、w は幅 */
+export const CloudShape: React.FC<{ x: number; y: number; w: number; color?: string; opacity?: number }> = ({ x, y, w, color = "#F4EEE0", opacity = 1 }) => {
+  const r = w / 5;
+  return (
+    <g opacity={opacity} filter="url(#paperLow)">
+      <path
+        d={`M${x},${y} a${r * 0.8},${r * 0.8} 0 0 1 ${r * 1.2},${-r * 0.6} a${r},${r} 0 0 1 ${r * 1.6},${-r * 0.5} a${r * 0.9},${r * 0.9} 0 0 1 ${r * 1.4},${r * 0.4} a${r * 0.7},${r * 0.7} 0 0 1 ${r * 0.8},${r * 0.7}Z`}
+        fill={color}
+      />
+      <path d={`M${x + r * 0.6},${y - r * 0.15} q${w * 0.4},${-r * 0.2} ${w * 0.8},0`} fill="none" stroke="#C9BFA8" strokeWidth={3} />
+    </g>
+  );
+};
+
+/** 八雲：小さな雲がゆっくり横に流れる（出雲回：「八雲立つ出雲」にちなむ） */
+const Yakumo: React.FC<{ f: number }> = ({ f }) => (
+  <g opacity={0.5}>
+    {Array.from({ length: 6 }, (_, i) => {
+      const speed = 0.3 + random(`yk${i}`) * 0.5;
+      const w = 120 + random(`ykw${i}`) * 120;
+      const x = ((random(`ykx${i}`) * (W + 400) + f * speed) % (W + 400)) - 300;
+      const y = 260 + random(`yky${i}`) * (H - 500);
+      return <CloudShape key={i} x={x} y={y} w={w} />;
+    })}
+  </g>
+);
+
+/** 冒頭：左右から雲が湧いて画面を覆い、流れ去って次の場面が現れる（出雲回） */
+const CloudIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 16, Easing.in(Easing.quad));
+  if (t >= 1) return null;
+  const rows = 9;
+  return (
+    <g>
+      {Array.from({ length: rows }, (_, i) => {
+        const y = (i + 0.5) * (H / rows) + 60;
+        const dir = i % 2 ? 1 : -1;
+        const off = dir * t * (W + 600);
+        return (
+          <g key={i} transform={`translate(${off},0)`}>
+            <rect x={-200} y={y - H / rows - 40} width={W + 400} height={H / rows + 80} fill="#F1EBDC" />
+            <CloudShape x={-120} y={y + 40} w={700} color="#F7F2E6" />
+            <CloudShape x={420} y={y + 30} w={760} color="#EDE5D2" />
+          </g>
+        );
+      })}
+    </g>
+  );
+};
 
 /** 湖のさざ波：あちこちで淡い波紋が広がって消える（継体回：近江の湖にちなむ） */
 const Ripples: React.FC<{ f: number }> = ({ f }) => (

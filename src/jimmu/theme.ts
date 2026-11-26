@@ -14,6 +14,7 @@ export const KUSA = "#7A845A"; // 山の緑
 export const HAI = "#8B7E6A"; // その他の豪族の駒
 export const MURASAKI = "#5E3C78"; // 紫（崇神回の主役・見出し）
 export const SUGI = "#4F6B3A"; // 杉の緑（崇神回）
+export const SEIDO = "#3F7F77"; // 青銅の緑青（出雲回）
 
 const mincho = loadMincho("normal", {
   weights: ["800"],

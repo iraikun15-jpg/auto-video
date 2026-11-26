@@ -22,7 +22,7 @@ const Bar: React.FC<{ x: number; y: number; len: number; deg: number; w: number;
   </g>
 );
 
-export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk" | "yuryaku" | "himiko" | "keitai" | "keitaiKasa";
+export type PersonKind = "jimmu" | "nagasune" | "folk" | "itsuse" | "takeru" | "sujin" | "susanoo" | "monk" | "yuryaku" | "himiko" | "keitai" | "keitaiKasa" | "okuninushi";
 
 export const Person: React.FC<{
   kind: PersonKind;
@@ -70,7 +70,7 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
 }) => {
   // 弓を引くときは前の腕を水平近くまで上げる
   const arm = arm0 + (80 - arm0) * draw;
-  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : kind === "yuryaku" ? "#5A3424" : kind === "himiko" ? "#2F5D50" : kind === "keitai" || kind === "keitaiKasa" ? "#B98A2A" : SHU);
+  const fill = color ?? (kind === "nagasune" ? SUMI : kind === "folk" ? SUMI : kind === "takeru" ? PAPER : kind === "sujin" ? MURASAKI : kind === "yuryaku" ? "#5A3424" : kind === "himiko" ? "#2F5D50" : kind === "keitai" || kind === "keitaiKasa" ? "#B98A2A" : kind === "okuninushi" ? "#3F7F77" : SHU);
   const tall = kind === "nagasune";
   // 長髄彦は「すねが長い」ので下腿を長く
   const legs: Limb = { hipX: 0, thigh: tall ? 120 : 110, shin: tall ? 200 : 120, w: tall ? 44 : 52 };
@@ -131,7 +131,16 @@ const PersonBody: React.FC<React.ComponentProps<typeof Person>> = ({
         <circle cx={6} cy={shoulderY - 40 - headR * 0.8} r={headR} fill={fill} />
         {/* 鼻・あご（横顔の輪郭だけ） */}
         <path d={`M${6 + headR - 6},${shoulderY - 40 - headR * 0.9} L${6 + headR + 14},${shoulderY - 40 - headR * 0.6} L${6 + headR - 4},${shoulderY - 40 - headR * 0.45}Z`} fill={fill} />
-        {kind === "keitaiKasa" ? (
+        {kind === "okuninushi" ? (
+          // 背中の大きな袋（大国主）とみずら
+          <g>
+            <path d={`M${-40},${shoulderY + 10} Q${-200},${shoulderY - 60} ${-190},${shoulderY + 130} Q${-180},${shoulderY + 230} ${-60},${shoulderY + 200}Z`} fill={fill} />
+            <path d={`M${-40},${shoulderY + 10} Q${-80},${shoulderY - 40} ${-120},${shoulderY - 20}`} fill="none" stroke={KIN} strokeWidth={6} />
+            <circle cx={-6} cy={shoulderY - 40 - headR * 0.45} r={20} fill="none" stroke={fill} strokeWidth={13} />
+            <circle cx={-6} cy={shoulderY - 40 - headR * 0.05} r={15} fill="none" stroke={fill} strokeWidth={11} />
+            <path d={`M${-40},${shoulderY - 40 - headR * 1.35} Q${6},${shoulderY - 40 - headR * 2.05} ${50},${shoulderY - 40 - headR * 1.4}Z`} fill={fill} />
+          </g>
+        ) : kind === "keitaiKasa" ? (
           // 旅の笠（地方から来た王）
           <g>
             <path d={`M${-120},${shoulderY - 40 - headR * 1.05} Q${6},${shoulderY - 40 - headR * 2.5} ${132},${shoulderY - 40 - headR * 1.05} Q${6},${shoulderY - 40 - headR * 1.3} ${-120},${shoulderY - 40 - headR * 1.05}Z`} fill={fill} />

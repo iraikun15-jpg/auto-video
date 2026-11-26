@@ -14,7 +14,8 @@
     "render:kusanagi": "node scripts/render-kusanagi.mjs",
     "render:yuryaku": "node scripts/render-yuryaku.mjs",
     "render:himiko": "node scripts/render-himiko.mjs",
-    "render:keitai": "node scripts/render-keitai.mjs"
+    "render:keitai": "node scripts/render-keitai.mjs",
+    "render:izumo": "node scripts/render-izumo.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",
