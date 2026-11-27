@@ -1,0 +1,66 @@
+{
+  "_説明": "台本ファイル（episodes/*.yaml）で使える名前と、プログラム内の名前の対応表。左が台本に書く名前",
+  "poses": {
+    "立つ": "STAND",
+    "気をつけ": "ATTENTION",
+    "指さし": "POINT",
+    "上を指す": "POINT_UP",
+    "挙手": "RAISE_HAND",
+    "手を振る": "WAVE",
+    "バンザイ": "BANZAI",
+    "ガッツポーズ": "GUTS",
+    "腰に手": "HANDS_ON_HIPS",
+    "腕組み": "ARMS_CROSSED",
+    "考える": "THINK",
+    "驚く": "SURPRISED",
+    "頭を抱える": "HEAD_IN_HANDS",
+    "落ち込む": "SLUMP",
+    "お辞儀": "BOW",
+    "深いお辞儀": "DEEP_BOW",
+    "スマホを見る": "PHONE",
+    "電話する": "PHONE_CALL",
+    "運ぶ": "CARRY",
+    "急ぐ": "HURRY",
+    "しゃがむ": "CROUCH",
+    "崩れ落ちる": "ORZ",
+    "座る": "SIT",
+    "座ってタイピング": "SIT_TYPE",
+    "座ってスマホ": "SIT_PHONE",
+    "座って伸び": "SIT_STRETCH",
+    "机に突っ伏す": "SIT_FACEPLANT",
+    "座って考える": "SIT_THINK",
+    "もたれる": "SIT_LEAN_BACK"
+  },
+  "poseAliases": {
+    "タイピング": "SIT_TYPE",
+    "立ち": "STAND",
+    "orz": "ORZ"
+  },
+  "motions": {
+    "歩く": "walk",
+    "走る": "run",
+    "うなずく": "nod",
+    "首を振る": "shake",
+    "ジャンプ": "jump",
+    "震える": "tremble",
+    "お辞儀する": "bow",
+    "謝る": "apologize",
+    "登場": "enter",
+    "退場": "exit"
+  },
+  "effects": {},
+  "props": {
+    "机": "desk",
+    "椅子": "chair",
+    "プリンター": "printer",
+    "紙束": "ream"
+  },
+  "backgrounds": {
+    "床": "floor",
+    "なし": "none"
+  },
+  "colors": {
+    "黒": "ink",
+    "赤": "red"
+  }
+}

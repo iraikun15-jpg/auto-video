@@ -45,6 +45,14 @@ jobs:
           cp out/ep2/ep2_full.mp4 out/video.mp4
           cat out/ep2/ep2_timing.md >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Render episodes from script files
+        # episodes/*.yaml のうち「公開: true」の回だけ書き出す
+        run: |
+          for id in $(node scripts/build-episodes.mjs --list); do
+            node scripts/render-episode.mjs "$id"
+            cat "out/$id/${id}_timing.md" >> "$GITHUB_STEP_SUMMARY"
+          done
+
       - name: Render pose catalog
         run: |
           npx remotion still src/index.ts PoseCatalog out/pose_catalog.png --log=warn
@@ -72,7 +80,9 @@ jobs:
         run: |
           TAG="video-${{ github.run_number }}"
           SHORT_SHA="${GITHUB_SHA::7}"
+          EPISODE_FILES=$(for id in $(node scripts/build-episodes.mjs --list); do ls out/$id/*; done)
           gh release create "$TAG" \
+            $EPISODE_FILES \
             out/video.mp4 out/ep2/* out/pose_catalog.png out/motion_demo.mp4 out/kaiju_test.mp4 out/kaiju_test_v2.mp4 out/kaiju_v4.mp4 \
             --target "$GITHUB_SHA" \
             --title "動画 #${{ github.run_number }} (${GITHUB_REF_NAME} @ ${SHORT_SHA})" \

@@ -1,9 +1,13 @@
+import React from "react";
 import { Composition, Still } from "remotion";
 import { ShortVideo } from "./ShortVideo";
 import { Ep2, Ep2Segments, EP2_TOTAL_FRAMES } from "./ep2/Ep2";
 import { Ep2Thumbnail } from "./ep2/Thumbnail";
 import { FPS } from "./ep2/common";
 import { MotionDemo, MOTION_DEMO_FRAMES, PoseCatalog } from "./rig/PoseCatalog";
+import episodes from "./story/episodes.generated.json";
+import { EpisodeFull, EpisodeSegment, EpisodeThumbnail } from "./story/Episode";
+import type { Episode } from "./story/types";
 import { KaijuTest, KAIJU_FRAMES } from "./kaiju/KaijuTest";
 import { KaijuTestV2, KAIJU_V2_FRAMES } from "./kaiju/KaijuTestV2";
 import { KaijuV4, KAIJU_V4_FRAMES } from "./kaiju/v4/KaijuV4";
@@ -33,6 +37,34 @@ export const RemotionRoot: React.FC = () => {
         />
       ))}
       <Still id="Ep2Thumbnail" component={Ep2Thumbnail} width={1080} height={1920} />
+
+      {/* 台本ファイル（episodes/*.yaml）から作る回。id は台本のファイル名 */}
+      {(episodes as unknown as Episode[]).map((ep) => (
+        <React.Fragment key={ep.id}>
+          <Composition
+            id={ep.id}
+            component={EpisodeFull}
+            width={1080}
+            height={1920}
+            fps={ep.fps}
+            durationInFrames={ep.totalFrames}
+            defaultProps={{ ep }}
+          />
+          {ep.segments.map((s, i) => (
+            <Composition
+              key={s.id}
+              id={`${ep.id}-${s.id}`}
+              component={EpisodeSegment}
+              width={1080}
+              height={1920}
+              fps={ep.fps}
+              durationInFrames={s.frames}
+              defaultProps={{ ep, index: i }}
+            />
+          ))}
+          <Still id={`${ep.id}-thumbnail`} component={EpisodeThumbnail} width={1080} height={1920} defaultProps={{ ep }} />
+        </React.Fragment>
+      ))}
 
       {/* 棒人間ポーズ集：一覧（静止画）と動きの見本（動画） */}
       <Still id="PoseCatalog" component={PoseCatalog} width={1080} height={1920} />

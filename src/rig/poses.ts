@@ -16,6 +16,7 @@ import { Easing } from "remotion";
 import { mixPose, Pose, poseAt, SIT_TYPING, shiftPose, STAND, track } from "./pose";
 import { solve } from "./StickFigure";
 import { FLOOR_Y, LINE } from "./theme";
+import names from "../story/names.json";
 
 const base = { x: 0, y: 0 };
 
@@ -343,38 +344,10 @@ export const POSES = {
 
 export type PoseName = keyof typeof POSES;
 
-/** 一覧表・指示ファイル用の日本語名 */
-export const POSE_LABELS: Record<PoseName, string> = {
-  STAND: "立つ",
-  ATTENTION: "気をつけ",
-  POINT: "指さし",
-  POINT_UP: "上を指す",
-  RAISE_HAND: "挙手",
-  WAVE: "手を振る",
-  BANZAI: "バンザイ",
-  GUTS: "ガッツポーズ",
-  HANDS_ON_HIPS: "腰に手",
-  ARMS_CROSSED: "腕組み",
-  THINK: "考える",
-  SURPRISED: "驚く",
-  HEAD_IN_HANDS: "頭を抱える",
-  SLUMP: "落ち込む",
-  BOW: "お辞儀",
-  DEEP_BOW: "深いお辞儀",
-  PHONE: "スマホを見る",
-  PHONE_CALL: "電話する",
-  CARRY: "運ぶ",
-  HURRY: "急ぐ",
-  CROUCH: "しゃがむ",
-  ORZ: "崩れ落ちる",
-  SIT: "座る",
-  SIT_TYPE: "座ってタイピング",
-  SIT_PHONE: "座ってスマホ",
-  SIT_STRETCH: "座って伸び",
-  SIT_FACEPLANT: "机に突っ伏す",
-  SIT_THINK: "座って考える",
-  SIT_LEAN_BACK: "もたれる",
-};
+/** 一覧表・台本ファイル用の日本語名（対応表は src/story/names.json にまとめてある） */
+export const POSE_LABELS = Object.fromEntries(
+  Object.entries(names.poses).map(([label, code]) => [code, label]),
+) as Record<PoseName, string>;
 
 // ---------------------------------------------------------------------------
 // 置き方

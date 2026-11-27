@@ -7,7 +7,9 @@
     "dev": "remotion studio",
     "render": "node scripts/render-ep2.mjs",
     "render:sample": "remotion render src/index.ts ShortVideo out/video.mp4 --codec=h264",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "episode": "node scripts/render-episode.mjs",
+    "episodes:build": "node scripts/build-episodes.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",
@@ -17,7 +19,8 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "remotion": "4.0.546",
-    "three": "0.170.0"
+    "three": "0.170.0",
+    "yaml": "2.6.1"
   },
   "devDependencies": {
     "@types/react": "18.3.12",

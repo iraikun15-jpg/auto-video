@@ -1,0 +1,189 @@
+[
+ {
+  "id": "sample",
+  "title": "サンプル「定時ダッシュ」",
+  "release": false,
+  "fps": 30,
+  "hold": 9,
+  "background": "floor",
+  "props": [
+   {
+    "type": "chair",
+    "x": 420
+   },
+   {
+    "type": "desk",
+    "x": 620
+   }
+  ],
+  "cast": {
+   "上司": {
+    "color": "red",
+    "tie": true,
+    "x": -150,
+    "facing": 1,
+    "pose": "STAND",
+    "always": false
+   },
+   "主人公": {
+    "color": "ink",
+    "tie": false,
+    "x": 480,
+    "facing": 1,
+    "pose": "SIT_TYPE",
+    "always": true
+   }
+  },
+  "segments": [
+   {
+    "id": "seg1",
+    "label": "定時まであと1分",
+    "script": "「よし、定時だ」",
+    "start": 0,
+    "frames": 90,
+    "texts": [
+     {
+      "start": 48,
+      "end": 90,
+      "text": "定時だ！",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "seg2",
+    "label": "帰ろうとした瞬間",
+    "script": "「お先に失礼しま…」「ちょっといい？」",
+    "start": 90,
+    "frames": 120,
+    "texts": [
+     {
+      "start": 150,
+      "end": 210,
+      "text": "ちょっと／いい？",
+      "color": "red"
+     }
+    ]
+   },
+   {
+    "id": "seg3",
+    "label": "オチ",
+    "script": "「……はい」",
+    "start": 210,
+    "frames": 90,
+    "texts": []
+   }
+  ],
+  "actions": [
+   {
+    "who": "主人公",
+    "start": 0,
+    "kind": "pose",
+    "code": "SIT_TYPE",
+    "seg": 0,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 48,
+    "kind": "pose",
+    "code": "SIT_STRETCH",
+    "seg": 0,
+    "opts": {
+     "ease": "はずむ"
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 90,
+    "kind": "pose",
+    "code": "STAND",
+    "seg": 1,
+    "opts": {
+     "x": 470,
+     "dur": 12
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 105,
+    "kind": "motion",
+    "code": "run",
+    "seg": 1,
+    "opts": {
+     "to": 300,
+     "then": "WAVE"
+    }
+   },
+   {
+    "who": "上司",
+    "start": 132,
+    "kind": "motion",
+    "code": "walk",
+    "seg": 1,
+    "opts": {
+     "to": 60,
+     "then": "POINT"
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 156,
+    "kind": "pose",
+    "code": "SURPRISED",
+    "seg": 1,
+    "opts": {
+     "facing": -1,
+     "ease": "ため"
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 162,
+    "kind": "motion",
+    "code": "tremble",
+    "seg": 1,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 210,
+    "kind": "pose",
+    "code": "ORZ",
+    "seg": 2,
+    "opts": {
+     "dur": 15
+    }
+   },
+   {
+    "who": "上司",
+    "start": 216,
+    "kind": "motion",
+    "code": "nod",
+    "seg": 2,
+    "opts": {
+     "times": 2
+    }
+   },
+   {
+    "who": "上司",
+    "start": 246,
+    "kind": "pose",
+    "code": "ARMS_CROSSED",
+    "seg": 2,
+    "opts": {}
+   }
+  ],
+  "thumbnail": {
+   "frame": 177,
+   "texts": [
+    {
+     "text": "定時ダッシュ",
+     "place": "上",
+     "color": "ink"
+    }
+   ]
+  },
+  "totalFrames": 300
+ }
+]
