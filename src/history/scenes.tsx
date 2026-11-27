@@ -6,7 +6,7 @@
 import React from "react";
 import { Easing, interpolate, useCurrentFrame } from "remotion";
 import { Boar, Crow, Person, Sun, Swan, Sword } from "../jimmu/figures";
-import { clamp01, CloudShape, Heading, MapLayer, Mountains, PlaceLabel, pop, ramp, Route, Stage, Stamp, sway, Tag } from "../jimmu/paper";
+import { clamp01, CloudShape, MapLayer, Mountains, PlaceLabel, pop, ramp, Route, Stage, Stamp, sway, Tag } from "../jimmu/paper";
 import { Cam, LL } from "../jimmu/geo";
 import { CHANNEL, KIN, KUSA, MINCHO, PAPER, PAPER_DARK, SHU, SUMI } from "../jimmu/theme";
 import { Mirror, GoldSeal, WeiPalace, Mound, Magnifier } from "../himiko/parts";
@@ -18,13 +18,13 @@ import { LANDS_ALL } from "../takeru/geo";
 import { IronSword } from "../yuryaku/parts";
 import type { HEpisode, HPart, HPerson, HScene } from "./types";
 
-const KIN_LIGHT = "#E8C77A";
+export const KIN_LIGHT = "#E8C77A";
 
 /** 文字数から、横幅 maxW に収まる札の文字の大きさ */
-const fit = (text: string, maxW: number, max: number) => Math.min(max, maxW / ([...text].length * 0.98 + 0.9));
+export const fit = (text: string, maxW: number, max: number) => Math.min(max, maxW / ([...text].length * 0.98 + 0.9));
 
 /** 場面内のフレーム。末尾の静止フレームは止める */
-const useSceneFrame = (sc: HScene, hold: number) => Math.min(useCurrentFrame(), sc.frames - hold - 1);
+export const useSceneFrame = (sc: HScene, hold: number) => Math.min(useCurrentFrame(), sc.frames - hold - 1);
 
 /** 部品（日輪・法隆寺など）。at から紙がペタッと貼られるように出る */
 export const PartView: React.FC<{ p: HPart; f: number }> = ({ p, f }) => {
@@ -125,7 +125,7 @@ export const PartView: React.FC<{ p: HPart; f: number }> = ({ p, f }) => {
 };
 
 /** 人物（影絵）。型ごとの既定の位置に、台本の指定を重ねる */
-const Figure: React.FC<{ ep: HEpisode; sc: HScene; f: number; x: number; y: number; s: number; flip?: boolean; opacity?: number }> = ({ ep, sc, f, x, y, s, flip, opacity = 1 }) => {
+export const Figure: React.FC<{ ep: HEpisode; sc: HScene; f: number; x: number; y: number; s: number; flip?: boolean; opacity?: number }> = ({ ep, sc, f, x, y, s, flip, opacity = 1 }) => {
   if (sc.person === null) return null;
   const p: HPerson = sc.person ?? ep.style.hero;
   const outlineColor = p.outline ?? (ep.style.night ? KIN : undefined);
@@ -146,7 +146,7 @@ const Figure: React.FC<{ ep: HEpisode; sc: HScene; f: number; x: number; y: numb
 };
 
 /** 台紙＋共通の重ね物（部品・判子・下の札）。型ごとの中身は children */
-const Frame: React.FC<{
+export const Frame: React.FC<{
   ep: HEpisode;
   sc: HScene;
   f: number;
@@ -156,17 +156,20 @@ const Frame: React.FC<{
   noteX?: number;
   children: React.ReactNode;
   under?: React.ReactNode;
-}> = ({ ep, sc, f, index, stampPos, noteY = 1790, noteX = 540, children, under }) => {
+}> = ({ ep, sc, f, index, stampPos, noteY, noteX, children, under }) => {
   const head = { bg: ep.style.tagBg, color: ep.style.tagColor };
+  const cx = ep.wide ? 960 : 540;
+  const nx = noteX ?? cx;
+  const ny = noteY ?? (ep.wide ? 1000 : 1790);
   return (
-    <Stage f={f} look={ep.style.particles} fx={ep.style.particles} trans={ep.style.transition} peel={index > 0} night={ep.style.night ? 1 : 0}>
+    <Stage f={f} look={ep.style.particles} fx={ep.style.particles} trans={ep.style.transition} peel={index > 0} night={ep.style.night ? 1 : 0} size={ep.wide ? { W: 1920, H: 1080 } : undefined}>
       {under}
       {children}
       {/* 部品は型の中身より手前（地図の上の舟など） */}
       {sc.parts.map((p, i) => (
         <PartView key={`p${i}`} p={p} f={f} />
       ))}
-      {sc.heading ? <Heading text={sc.heading} t={pop(f, 0, 10)} y={200} size={fit(sc.heading, 960, 84)} {...head} /> : null}
+      {sc.heading ? <Tag x={cx} y={ep.wide ? 110 : 200} text={sc.heading} t={pop(f, 0, 10)} rot={-1.2} size={fit(sc.heading, ep.wide ? 1500 : 960, ep.wide ? 74 : 84)} {...head} /> : null}
       {sc.stamps.map((st, i) => (
         <Stamp
           key={`s${i}`}
@@ -180,7 +183,7 @@ const Frame: React.FC<{
           color={st.color}
         />
       ))}
-      {sc.note ? <Tag x={noteX} y={noteY} text={sc.note.text} size={fit(sc.note.text, 1040 - 2 * Math.abs(noteX - 540), 52)} t={pop(f, sc.note.at, 12)} rot={-1.5} bg={sc.note.bg} color={PAPER} /> : null}
+      {sc.note ? <Tag x={nx} y={ny} text={sc.note.text} size={fit(sc.note.text, (ep.wide ? 1880 : 1040) - 2 * Math.abs(nx - cx), 52)} t={pop(f, sc.note.at, 12)} rot={-1.5} bg={sc.note.bg} color={PAPER} /> : null}
     </Stage>
   );
 };
@@ -188,7 +191,7 @@ const Frame: React.FC<{
 // =====================================================================
 // 型ごとの画面
 // =====================================================================
-type P = { ep: HEpisode; sc: HScene; index: number };
+export type P = { ep: HEpisode; sc: HScene; index: number };
 
 /** フック：0フレーム目から大見出しを叩きつける（拍子木＋太鼓）。判子は0フレーム目に着く */
 const Hook: React.FC<P> = ({ ep, sc, index }) => {
@@ -475,6 +478,83 @@ const Subscribe: React.FC<P> = ({ ep, sc, index }) => {
   );
 };
 
+/** タイトル：題名を大きく（長尺のオープニング） */
+const Title: React.FC<P> = ({ ep, sc, index }) => {
+  const f = useSceneFrame(sc, ep.hold);
+  const big = sc.big ?? [];
+  const size = Math.min(...big.map((l) => fit(l, 940, 130)));
+  const t = pop(f, 4, 14);
+  return (
+    <Frame ep={ep} sc={sc} f={f} index={index} stampPos={[540, 1150, 110]} noteY={1000}>
+      <Sun x={540} y={1380} r={200} rot={f * 0.2} opacity={0.7} color={KIN_LIGHT} />
+      <Figure ep={ep} sc={sc} f={f} x={540} y={1880} s={0.8} />
+      <g opacity={clamp01(t * 2)} transform={`translate(540,620) scale(${interpolate(t, [0, 1], [0.8, 1])})`}>
+        <rect x={-500} y={-230} width={1000} height={460} rx={14} fill={ep.style.tagBg} opacity={0.94} />
+        <rect x={-484} y={-214} width={968} height={428} rx={10} fill="none" stroke={KIN} strokeWidth={6} />
+        {big.map((l, i) => (
+          <text key={i} x={0} y={big.length === 1 ? 45 : -40 + i * 170} textAnchor="middle" fontFamily={MINCHO} fontWeight={800} fontSize={size} fill={i === 1 ? KIN_LIGHT : ep.style.tagColor}>
+            {l}
+          </text>
+        ))}
+      </g>
+    </Frame>
+  );
+};
+
+/** 章：第N章＋章の題（長尺の区切り） */
+const Chapter: React.FC<P> = ({ ep, sc, index }) => {
+  const f = useSceneFrame(sc, ep.hold);
+  const title = sc.chapterTitle ?? "";
+  const line = ramp(f, 14, 34);
+  return (
+    <Frame ep={ep} sc={sc} f={f} index={index} stampPos={[540, 1250, 90]}>
+      <Tag x={540} y={640} text={`第${KANJI_NUM[sc.chapterNo ?? 1] ?? sc.chapterNo}章`} size={64} t={pop(f, 2, 10)} rot={-2} bg={ep.style.tagBg} color={ep.style.tagColor} />
+      <Tag x={540} y={860} text={title} size={fit(title, 960, 110)} t={pop(f, 10, 14)} rot={1} bg={PAPER} color={SUMI} />
+      <rect x={540 - 380 * line} y={990} width={760 * line} height={8} fill={KIN} />
+      <Figure ep={ep} sc={sc} f={f} x={540} y={1880} s={0.6} opacity={0.9} />
+    </Frame>
+  );
+};
+
+/** 語り：人物と部品を見せながら、要点の札をゆっくり貼る（ナレーションの長い区間） */
+const Narration: React.FC<P> = ({ ep, sc, index }) => {
+  const f = useSceneFrame(sc, ep.hold);
+  const items = sc.items ?? [];
+  return (
+    <Frame ep={ep} sc={sc} f={f} index={index} stampPos={[540, 1180, 100]}>
+      <Figure ep={ep} sc={sc} f={f} x={540} y={1880} s={0.85} />
+      {items.map((it, i) => (
+        <Tag key={i} x={540 + (i % 2 ? 60 : -60)} y={400 + i * 130} text={it.text} size={fit(it.text, 860, 56)} t={pop(f, it.at, 12)} rot={i % 2 ? 1.5 : -1.5} bg={PAPER} color={SUMI} />
+      ))}
+    </Frame>
+  );
+};
+
+/** まとめ：要点を朱の印つきで並べる */
+const Summary: React.FC<P> = ({ ep, sc, index }) => {
+  const f = useSceneFrame(sc, ep.hold);
+  const items = sc.items ?? [];
+  const step = Math.min(200, 1000 / Math.max(1, items.length));
+  return (
+    <Frame ep={ep} sc={{ ...sc, heading: sc.heading ?? "まとめ" }} f={f} index={index} stampPos={[760, 1620, 96]}>
+      {items.map((it, i) => {
+        const y = 420 + i * step;
+        const t = pop(f, it.at, 12);
+        return (
+          <g key={i}>
+            <circle cx={110} cy={y} r={30 * t} fill={SHU} />
+            <Tag x={570} y={y} text={it.text} size={fit(it.text, 820, 60)} t={t} rot={i % 2 ? 1 : -1} bg={PAPER} color={SUMI} />
+          </g>
+        );
+      })}
+      <Figure ep={ep} sc={sc} f={f} x={250} y={1890} s={0.5} />
+    </Frame>
+  );
+};
+
+/** 漢数字（章の番号） */
+export const KANJI_NUM = ["〇", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五"];
+
 export const SCENE_TYPES: Record<HScene["type"], React.FC<P>> = {
   hook: Hook,
   intro: Intro,
@@ -486,4 +566,8 @@ export const SCENE_TYPES: Record<HScene["type"], React.FC<P>> = {
   verdict: Verdict,
   choice: Choice,
   subscribe: Subscribe,
+  title: Title,
+  chapter: Chapter,
+  narration: Narration,
+  summary: Summary,
 };

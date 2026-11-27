@@ -153,6 +153,10 @@
     "IF": "ifcase",
     "判定": "verdict",
     "二択": "choice",
-    "登録": "subscribe"
+    "登録": "subscribe",
+    "タイトル": "title",
+    "章": "chapter",
+    "語り": "narration",
+    "まとめ": "summary"
   }
 }

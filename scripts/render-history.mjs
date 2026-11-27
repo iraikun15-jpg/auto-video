@@ -44,7 +44,7 @@ const boundaries = scenes.map((s) => s.start);
 const glitchCheck = (file) => {
   const log = execFileSync(
     "ffmpeg",
-    ["-v", "error", "-i", `${OUT}/${file}`, "-vf", "scale=540:960,select=gt(scene\\,0.25),metadata=print:file=-", "-an", "-f", "null", "-"],
+    ["-v", "error", "-i", `${OUT}/${file}`, "-vf", `scale=${ep.wide ? "960:540" : "540:960"},select=gt(scene\\,0.25),metadata=print:file=-`, "-an", "-f", "null", "-"],
     { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
   );
   const frames = [...log.matchAll(/pts_time:([0-9.]+)/g)].map((m) => Math.round(Number(m[1]) * FPS));
@@ -62,7 +62,7 @@ const full = probe(`${id}_full.mp4`);
 const light = probe(`${id}_full_light.mp4`);
 for (const [name, p] of [[`${id}_full.mp4`, full], [`${id}_full_light.mp4`, light]]) {
   if (p.frames !== totalFrames) throw new Error(`${name}: 想定${totalFrames}f / 実際${p.frames}f`);
-  if (p.width !== 1080 || p.height !== 1920) throw new Error(`${name}: 解像度 ${p.width}×${p.height}`);
+  if (p.width !== (ep.wide ? 1920 : 1080) || p.height !== (ep.wide ? 1080 : 1920)) throw new Error(`${name}: 解像度 ${p.width}×${p.height}`);
   if (!p.audio) throw new Error(`${name}: 音声トラックがありません`);
 }
 const changes = glitchCheck(`${id}_full.mp4`);
@@ -72,6 +72,10 @@ if (loud.peak > -5) throw new Error(`ピークが高すぎます: ${loud.peak} d
 
 // ---- タイミング表 ----
 const sec = (fr) => (fr / FPS).toFixed(2);
+const mmss = (fr) => {
+  const t = Math.floor(fr / FPS);
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+};
 const rows = scenes.map((s) => `| ${s.id} | ${s.label} | ${sec(s.start)} | ${sec(s.start + s.frames)} | ${sec(s.frames)} | ${sec(s.start + s.frames - HOLD)} |`);
 const NAME = { hook: "冒頭フック：拍子木＋太鼓の一打", stamp: "判子", transition: "場面転換", click: "登録ボタンのクリック", ting: "金の判子の鈴" };
 const sfx = events.filter((e) => e.kind !== "place").map((e) => `| ${sec(e.frame)} | ${NAME[e.kind]}（${e.seg}） |`);
@@ -83,7 +87,13 @@ const md = `# ${ep.title} タイミング表
 - 各場面の末尾 ${HOLD}フレーム（${sec(HOLD)}秒）は動きを止めた余白です
 - 札が貼られるときの小さな「コトッ」は表から省いています
 
-## 場面の開始秒（ナレーション同期用）
+${ep.chapters.length ? `## YouTube のチャプター（概要欄にそのまま貼れます）
+
+\`\`\`
+${ep.chapters.map((c) => `${mmss(c.frame)} ${c.no ? `第${c.no}章 ` : ""}${c.title}`).join("\n")}
+\`\`\`
+
+` : ""}## 場面の開始秒（ナレーション同期用）
 
 | 場面 | 内容 | 開始(秒) | 終了(秒) | 長さ(秒) | 静止の開始(秒) |
 |---|---|---|---|---|---|

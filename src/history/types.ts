@@ -8,7 +8,7 @@ export type HPart = { name: string; x: number; y: number; s: number; at: number;
 
 export type HScene = {
   id: string;
-  type: "hook" | "intro" | "timeline" | "map" | "points" | "compare" | "ifcase" | "verdict" | "choice" | "subscribe";
+  type: "hook" | "intro" | "timeline" | "map" | "points" | "compare" | "ifcase" | "verdict" | "choice" | "subscribe" | "title" | "chapter" | "narration" | "summary";
   start: number;
   frames: number;
   label: string;
@@ -36,11 +36,15 @@ export type HScene = {
   a?: string[];
   b?: string[];
   clickAt?: number;
+  chapterNo?: number;
+  chapterTitle?: string;
 };
 
 export type HEpisode = {
   id: string;
   title: string;
+  wide: boolean; // 横（長尺・1920×1080）
+  chapters: { title: string; frame: number; no: number }[];
   fps: number;
   hold: number;
   stampLand: number;

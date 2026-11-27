@@ -45,6 +45,8 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
   - 仕組み: `scripts/build-history.mjs`（検証・タイミング決め）→ `src/history/scenes.tsx`（型ごとの画面）・`HistoryVideo.tsx`（結合版・サムネ）／`scripts/synth-history.mjs`（BGM・効果音、-28 LUFS に自動でそろえる）／`scripts/render-history.mjs`（書き出しと検品）
   - 依頼者の指示書を受けたら、まず YAML に書き起こし、型で足りない見せ場だけ部品や専用の場面を足す
   - `Stage` は `fx`（舞うもの）と `trans`（転換）を別々に指定できる（既存の回は `look` だけで今までどおり）
+  - **長尺（横 1920×1080）**: 台本に `画面: 横`。配置は `src/history/scenesWide.tsx`（縦は `scenes.tsx`）。長尺用の型「タイトル・章・語り・まとめ」、タイミング表に YouTube のチャプター一覧。目安 8〜10分・4〜5章、書き出しは 8分で約40分。見本 `history/long-sample.yaml`
+  - `Stage` は `size` で画面の大きさを受け取り、舞うもの・転換は `useStageSize()` で大きさを読む
 - 第1本「神武天皇は実在したのか」Short: `src/jimmu/`、書き出しは `npm run render:jimmu`（`out/jimmu/` に結合版・seg1〜9・サムネ・タイミング表）
 - スタイル: 依頼者が「切り絵（Paper Cutout）＋地図の場面は作戦盤（Tactics Board）」を選んだ。和紙の台紙・藍の海（青海波）・朱/墨/金
   - 部品: `paper.tsx`（台紙・地図・札・判子・駒・ルート・矢）、`figures.tsx`（影絵の人物・八咫烏・日輪）、`geo.ts`（簡略地図・カメラ・ルート）

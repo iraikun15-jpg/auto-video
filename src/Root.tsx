@@ -76,13 +76,13 @@ export const RemotionRoot: React.FC = () => {
           <Composition
             id={`h-${ep.id}`}
             component={HistoryVideo}
-            width={1080}
-            height={1920}
+            width={ep.wide ? 1920 : 1080}
+            height={ep.wide ? 1080 : 1920}
             fps={ep.fps}
             durationInFrames={ep.totalFrames}
             defaultProps={{ ep, withAudio: true }}
           />
-          <Still id={`h-${ep.id}-thumbnail`} component={HistoryThumbnail} width={1080} height={1920} defaultProps={{ ep }} />
+          <Still id={`h-${ep.id}-thumbnail`} component={HistoryThumbnail} width={ep.wide ? 1920 : 1080} height={ep.wide ? 1080 : 1920} defaultProps={{ ep }} />
         </React.Fragment>
       ))}
 

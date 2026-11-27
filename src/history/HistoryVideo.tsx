@@ -7,13 +7,14 @@ import { Person, Sun } from "../jimmu/figures";
 import { Stage, Stamp } from "../jimmu/paper";
 import { KIN, MINCHO, PAPER, SUMI } from "../jimmu/theme";
 import { PartView, SCENE_TYPES } from "./scenes";
+import { WIDE_SCENE_TYPES } from "./scenesWide";
 import type { HEpisode } from "./types";
 
 export const HistoryVideo: React.FC<{ ep: HEpisode; withAudio?: boolean }> = ({ ep, withAudio = true }) => (
   <>
     <Series>
       {ep.scenes.map((sc, i) => {
-        const C = SCENE_TYPES[sc.type];
+        const C = (ep.wide ? WIDE_SCENE_TYPES : SCENE_TYPES)[sc.type];
         return (
           <Series.Sequence key={sc.id} durationInFrames={sc.frames}>
             <C ep={ep} sc={sc} index={i} />
@@ -25,8 +26,33 @@ export const HistoryVideo: React.FC<{ ep: HEpisode; withAudio?: boolean }> = ({ 
   </>
 );
 
+/** 横（長尺）のサムネイル：左に大きなタイトル、右に主役と日輪、左上に朱の判子 */
+const WideThumbnail: React.FC<{ ep: HEpisode }> = ({ ep }) => {
+  const lines = ep.thumb.lines;
+  const size = (s: string, max: number) => Math.min(max, 1060 / [...s].length);
+  const big = (s: string, y: number, sz: number) => (
+    <text x={620} y={y} textAnchor="middle" fontFamily={MINCHO} fontWeight={800} fontSize={sz} fill={SUMI} stroke={PAPER} strokeWidth={24} paintOrder="stroke">
+      {s}
+    </text>
+  );
+  const hero = ep.style.hero;
+  return (
+    <Stage peel={false} look={ep.style.particles} night={ep.style.night ? 1 : 0} size={{ W: 1920, H: 1080 }}>
+      <Sun x={1500} y={430} r={240} color="#E8C77A" />
+      {ep.thumb.parts.map((p, i) => (
+        <PartView key={i} p={p} f={0} />
+      ))}
+      {ep.thumb.person ? <Person kind={hero.kind} color={hero.color} x={1500} y={1070} scale={0.95} flip arm={20} outline outlineColor={hero.outline ?? KIN} /> : null}
+      {lines[0] ? big(lines[0], lines[1] ? 560 : 640, size(lines[0], 170)) : null}
+      {lines[1] ? big(lines[1], 790, size(lines[1], 150)) : null}
+      {ep.thumb.stamp ? <Stamp x={330} y={230} text={ep.thumb.stamp} size={Math.min(140, 560 / [...ep.thumb.stamp].length)} t={1} rot={-5} /> : null}
+    </Stage>
+  );
+};
+
 /** サムネイル：上に朱の判子、中央に部品、下に大きなタイトル＋主役の影（これまでの回と同じ構図） */
 export const HistoryThumbnail: React.FC<{ ep: HEpisode }> = ({ ep }) => {
+  if (ep.wide) return <WideThumbnail ep={ep} />;
   const lines = ep.thumb.lines;
   const size = (s: string, max: number) => Math.min(max, 820 / ([...s].length * 1.0));
   const big = (s: string, y: number, sz: number) => (

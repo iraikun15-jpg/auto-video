@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Easing, Img, interpolate, random, staticFile } from "remotion";
 import { Cam, LANDS, LL, partial, polyPath, project } from "./geo";
-import { AI, AI_LIGHT, H, KIN, MINCHO, MURASAKI, PAPER, PAPER_BG, SANS, SHU, SUGI, SUMI, W } from "./theme";
+import { AI, AI_LIGHT, H as H0, KIN, MINCHO, MURASAKI, PAPER, PAPER_BG, SANS, SHU, SUGI, SUMI, W as W0 } from "./theme";
 
 // ---------- 時間の補助 ----------
 export const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -13,6 +13,11 @@ export const pop = (f: number, at: number, dur = 10) => ramp(f, at, at + dur, Ea
 /** 紙のゆらぎ（ゆっくりした揺れ） */
 export const sway = (f: number, seed: number, amp = 1.2, speed = 0.06) =>
   Math.sin(f * speed + seed * 7.3) * amp;
+
+// ---------- 画面の大きさ ----------
+/** 台紙の大きさ。既定は縦（1080×1920）。日本史キットの長尺（横）は 1920×1080 を渡す */
+const StageSize = React.createContext<{ W: number; H: number }>({ W: W0, H: H0 });
+export const useStageSize = () => React.useContext(StageSize);
 
 // ---------- 画面とフィルタ ----------
 /**
@@ -56,14 +61,17 @@ export const Stage: React.FC<{
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
   fx?: Look; // 舞うものだけ別の回のものにする（日本史キット用。省略時は look と同じ）
   trans?: Look; // 場面転換だけ別の回のものにする（同上）
-}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look: baseLook = "jimmu", night, fx, trans }) => {
+  size?: { W: number; H: number }; // 画面の大きさ（横長の長尺用。既定は縦 1080×1920）
+}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look: baseLook = "jimmu", night, fx, trans, size }) => {
+  const { W, H } = size ?? { W: W0, H: H0 };
   const dark = night ?? (baseLook === "kusanagi" ? 1 : 0);
   // 舞うもの・場面転換は別々に選べる（既存の回は look だけ渡すので今までどおり）
   const fxLook: Look = fx ?? baseLook;
   const transLook: Look = trans ?? baseLook;
   return (
+  <StageSize.Provider value={{ W, H }}>
   <AbsoluteFill style={{ backgroundColor: PAPER_BG }}>
-    <Img src={staticFile("jimmu/washi_bg.jpg")} style={{ position: "absolute", width: W, height: H }} />
+    <Img src={staticFile("jimmu/washi_bg.jpg")} style={{ position: "absolute", width: W, height: H, objectFit: "cover" }} />
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ position: "absolute" }}>
       <Defs f={f} />
       {dark > 0 ? (
@@ -90,13 +98,16 @@ export const Stage: React.FC<{
       {fxLook === "takeru" ? <Feathers f={f} /> : fxLook === "sujin" ? <SugiLeaves f={f} /> : fxLook === "kusanagi" ? <Motes f={f} /> : fxLook === "yuryaku" ? <FloatingGlyphs f={f} /> : fxLook === "himiko" ? <MirrorGlints f={f} /> : fxLook === "keitai" ? <Ripples f={f} /> : fxLook === "izumo" ? <Yakumo f={f} /> : fxLook === "suiko" ? <LotusPetals f={f} /> : fxLook === "shotoku" ? <Palmettes f={f} /> : <Flecks f={f} />}
       {peel ? transLook === "takeru" ? <ScrollIn f={f} /> : transLook === "sujin" ? <MisuIn f={f} /> : transLook === "kusanagi" ? <SlashIn f={f} /> : transLook === "yuryaku" ? <XrayIn f={f} /> : transLook === "himiko" ? <PageTurnIn f={f} /> : transLook === "keitai" ? <FusumaIn f={f} /> : transLook === "izumo" ? <CloudIn f={f} /> : transLook === "suiko" ? <KaniIn f={f} /> : transLook === "shotoku" ? <HaloIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
-    <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
+    <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, objectFit: "cover", opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
+  </StageSize.Provider>
   );
 };
 
 /** ゆっくり舞う金と紙の小片（画面が止まって見えないように） */
-const Flecks: React.FC<{ f: number }> = ({ f }) => (
+const Flecks: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 14 }, (_, i) => {
       const sx = random(`fx${i}`) * W;
@@ -119,10 +130,13 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 蓮の花びらがひらひら舞い落ちる（推古回：仏教が栄えた飛鳥の時代） */
-const LotusPetals: React.FC<{ f: number }> = ({ f }) => (
+const LotusPetals: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 9 }, (_, i) => {
       const speed = 0.5 + random(`lp${i}`) * 0.7;
@@ -137,10 +151,12 @@ const LotusPetals: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：冠位十二階の6色の帯が縦に並んで画面を覆い、上下へ流れ去る（推古回） */
 const KaniIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 16, Easing.in(Easing.cubic));
   if (t >= 1) return null;
   const cols = ["#5E3C78", "#2F5D8A", "#C2412D", "#D9B03A", "#F2EEE4", "#211D1A"];
@@ -162,7 +178,9 @@ const KaniIn: React.FC<{ f: number }> = ({ f }) => {
 };
 
 /** 忍冬唐草（飛鳥の寺の文様）の金の小片がゆっくり舞う（聖徳太子回） */
-const Palmettes: React.FC<{ f: number }> = ({ f }) => (
+const Palmettes: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 8 }, (_, i) => {
       const speed = 0.35 + random(`pm${i}`) * 0.5;
@@ -180,10 +198,12 @@ const Palmettes: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：紺の幕に光背（舟形の光）の形の窓が開いて広がる（聖徳太子回） */
 const HaloIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 16, Easing.in(Easing.quad));
   if (t >= 1) return null;
   const k = 0.02 + t * 2.6;
@@ -217,7 +237,9 @@ export const CloudShape: React.FC<{ x: number; y: number; w: number; color?: str
 };
 
 /** 八雲：小さな雲がゆっくり横に流れる（出雲回：「八雲立つ出雲」にちなむ） */
-const Yakumo: React.FC<{ f: number }> = ({ f }) => (
+const Yakumo: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g opacity={0.5}>
     {Array.from({ length: 6 }, (_, i) => {
       const speed = 0.3 + random(`yk${i}`) * 0.5;
@@ -227,10 +249,12 @@ const Yakumo: React.FC<{ f: number }> = ({ f }) => (
       return <CloudShape key={i} x={x} y={y} w={w} />;
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：左右から雲が湧いて画面を覆い、流れ去って次の場面が現れる（出雲回） */
 const CloudIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 16, Easing.in(Easing.quad));
   if (t >= 1) return null;
   const rows = 9;
@@ -253,7 +277,9 @@ const CloudIn: React.FC<{ f: number }> = ({ f }) => {
 };
 
 /** 湖のさざ波：あちこちで淡い波紋が広がって消える（継体回：近江の湖にちなむ） */
-const Ripples: React.FC<{ f: number }> = ({ f }) => (
+const Ripples: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 7 }, (_, i) => {
       const period = 120 + Math.floor(random(`rp${i}`) * 80);
@@ -271,10 +297,12 @@ const Ripples: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：襖（ふすま）が中央から左右へ開き、次の場面が現れる（継体回） */
 const FusumaIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 16, Easing.inOut(Easing.cubic));
   if (t >= 1) return null;
   const half = W / 2;
@@ -298,7 +326,9 @@ const FusumaIn: React.FC<{ f: number }> = ({ f }) => {
 };
 
 /** 小さな銅鏡がくるりと回りながら漂い、ときどき光る（卑弥呼回） */
-const MirrorGlints: React.FC<{ f: number }> = ({ f }) => (
+const MirrorGlints: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 10 }, (_, i) => {
       const speed = 0.3 + random(`mg${i}`) * 0.5;
@@ -317,10 +347,12 @@ const MirrorGlints: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：線装本のページが右から左へめくれ、次の場面が現れる（卑弥呼回） */
 const PageTurnIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
   if (t >= 1) return null;
   // ページは左端（綴じ側）を軸にして、幅が 1→0 に縮みながら左へ倒れる
@@ -343,7 +375,9 @@ const PageTurnIn: React.FC<{ f: number }> = ({ f }) => {
 
 /** 稲荷山鉄剣の銘文の文字がかすかに漂う（雄略回） */
 const GLYPHS = [..."辛亥年七月中記乎獲居臣上祖名意富比垝獲加多支鹵大王寺在斯鬼宮時吾左治天下令作此百練利刀"];
-const FloatingGlyphs: React.FC<{ f: number }> = ({ f }) => (
+const FloatingGlyphs: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 12 }, (_, i) => {
       const speed = 0.35 + random(`gy${i}`) * 0.5;
@@ -357,10 +391,12 @@ const FloatingGlyphs: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：X線のスキャン光が上から下へ走り、光の通ったあとに次の場面が現れる（雄略回） */
 const XrayIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
   if (t >= 1) return null;
   const y = -40 + t * (H + 80);
@@ -381,7 +417,9 @@ const XrayIn: React.FC<{ f: number }> = ({ f }) => {
 };
 
 /** 蛍火のような光の粒がゆっくり昇る（草薙剣回） */
-const Motes: React.FC<{ f: number }> = ({ f }) => (
+const Motes: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g style={{ mixBlendMode: "screen" }}>
     <radialGradient id="moteGrad">
       <stop offset="0" stopColor="#FFF4C8" stopOpacity={1} />
@@ -402,10 +440,12 @@ const Motes: React.FC<{ f: number }> = ({ f }) => (
       return <circle key={i} cx={x} cy={y} r={r} fill={`url(#${i % 3 === 0 ? "moteGrad2" : "moteGrad"})`} opacity={flicker} />;
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：剣閃。斜めに光の線が走り、夜の紙が二つに切り分かれて左右へ退く（草薙剣回） */
 const SlashIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const flash = ramp(f, 0, 3) * (1 - ramp(f, 5, 12));
   const open = ramp(f, 3, 16, Easing.in(Easing.cubic));
   if (open >= 1) return null;
@@ -438,7 +478,9 @@ const SlashIn: React.FC<{ f: number }> = ({ f }) => {
 };
 
 /** ゆっくり舞い落ちる杉の葉（崇神回：三輪の神杉にちなむ） */
-const SugiLeaves: React.FC<{ f: number }> = ({ f }) => (
+const SugiLeaves: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 9 }, (_, i) => {
       const speed = 0.6 + random(`sg${i}`) * 0.8;
@@ -456,10 +498,12 @@ const SugiLeaves: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：竹の御簾（みす）が上へ巻き上がり、次の場面が現れる（崇神回） */
 const MisuIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
   if (t >= 1) return null;
   const bottom = H * (1 - t);
@@ -484,7 +528,9 @@ const MisuIn: React.FC<{ f: number }> = ({ f }) => {
 };
 
 /** ゆっくり舞い落ちる白い羽根（ヤマトタケル回：白鳥伝説にちなむ） */
-const Feathers: React.FC<{ f: number }> = ({ f }) => (
+const Feathers: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
+  return (
   <g>
     {Array.from({ length: 9 }, (_, i) => {
       const speed = 0.7 + random(`ws${i}`) * 0.8;
@@ -501,10 +547,12 @@ const Feathers: React.FC<{ f: number }> = ({ f }) => (
       );
     })}
   </g>
-);
+  );
+};
 
 /** 冒頭：木の軸の巻物が左から右へ転がり、軸の通ったあとに新しい場面が現れる（ヤマトタケル回） */
 const ScrollIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 15, Easing.inOut(Easing.cubic));
   if (t >= 1) return null;
   const rx = -40 + t * (W + 100);
@@ -529,6 +577,7 @@ const ScrollIn: React.FC<{ f: number }> = ({ f }) => {
 
 /** 冒頭：前の場面の紙が、破れた端からめくれて左へ剥がれていく */
 const PeelIn: React.FC<{ f: number }> = ({ f }) => {
+  const { W, H } = useStageSize();
   const t = ramp(f, 0, 13, Easing.in(Easing.quad));
   if (t >= 1) return null;
   const off = -300 - t * 1300;

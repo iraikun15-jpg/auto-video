@@ -54,6 +54,10 @@ const TYPE_KEYS = {
   verdict: ["判定", "金"],
   choice: ["A", "B"],
   subscribe: [],
+  title: ["大見出し"],
+  chapter: ["題"],
+  narration: ["項目"],
+  summary: ["項目"],
 };
 
 const buildEpisode = (file) => {
@@ -61,7 +65,10 @@ const buildEpisode = (file) => {
   if (!/^[a-z0-9-]+$/.test(id)) fail(file, "ファイル名は半角の英小文字・数字・ハイフンだけにしてください（例: soga.yaml）");
   const raw = parse(readFileSync(`${DIR}/${file}`, "utf8")) ?? {};
   const W = (s) => `${file} ${s}`;
-  allowKeys(raw, ["タイトル", "見た目", "音", "場面", "サムネイル"], W(""));
+  allowKeys(raw, ["タイトル", "画面", "見た目", "音", "場面", "サムネイル"], W(""));
+  // 画面の向き：縦（Short・1080×1920）／横（長尺・1920×1080）
+  if (raw.画面 !== undefined && raw.画面 !== "縦" && raw.画面 !== "横") fail(W("画面"), "「画面」は 縦 か 横 で書いてください");
+  const wide = raw.画面 === "横";
 
   // ---- 見た目 ----
   const look = raw.見た目 ?? {};
@@ -98,6 +105,8 @@ const buildEpisode = (file) => {
   const scenesRaw = raw.場面 ?? [];
   if (scenesRaw.length === 0) fail(W(""), "「場面」がありません");
   let start = 0;
+  let chapterNo = 0;
+  const chapters = []; // 長尺の章（YouTube のチャプター用）
   const events = []; // 効果音のきっかけ（結合版のフレーム）
   const scenes = scenesRaw.map((s, si) => {
     const sid = `seg${si + 1}`;
@@ -113,8 +122,8 @@ const buildEpisode = (file) => {
       if (fr > last) fail(w, `${sec}秒は場面（${s.秒}秒、最後の0.3秒は静止）の外です`);
       return fr;
     };
-    // 項目を場面の前半〜6割に等間隔で出す
-    const spread = (n, from = 12, until = Math.round(last * 0.6)) =>
+    // 項目を場面の前半〜6割（長い場面は8割5分）に等間隔で出す
+    const spread = (n, from = 12, until = Math.round(last * (frames > 600 ? 0.85 : 0.6))) =>
       Array.from({ length: n }, (_, i) => Math.round(from + (n <= 1 ? 0 : ((until - from) * i) / (n - 1))));
 
     const sc = { id: sid, type, start, frames, label: String(s.内容 ?? Object.keys(N.sceneTypes).find((k) => N.sceneTypes[k] === type)) };
@@ -184,15 +193,29 @@ const buildEpisode = (file) => {
       sc.big = big;
       if (si === 0) events.push({ kind: "hook", frame: start, seg: sid });
     }
+    if (type === "title") {
+      const big = lines(s.大見出し ?? raw.タイトル);
+      if (big.length === 0 || big.length > 2) fail(where, "「大見出し」は1〜2行で書いてください");
+      sc.big = big;
+      if (si === 0) events.push({ kind: "hook", frame: start, seg: sid });
+    }
+    if (type === "chapter") {
+      if (!s.題) fail(where, "「題: 神話の中の天皇」のように章の題を書いてください");
+      chapterNo += 1;
+      sc.chapterNo = chapterNo;
+      sc.chapterTitle = String(s.題);
+      chapters.push({ title: sc.chapterTitle, frame: start, no: chapterNo });
+    }
     if (type === "intro") {
       const n = s.名前 ?? {};
       allowKeys(n, ["大", "読み", "注"], `${where} 名前`);
       if (!n.大) fail(where, "「名前: { 大: 厩戸皇子 }」のように名前を書いてください");
       sc.name = { big: String(n.大), reading: n.読み && String(n.読み), note: n.注 && String(n.注), at: [10, 30, 44] };
     }
-    if (type === "timeline" || type === "points") {
+    if (type === "timeline" || type === "points" || type === "narration" || type === "summary") {
       const items = s.項目 ?? [];
-      if (items.length === 0 || items.length > 5) fail(where, "「項目」は1〜5個で書いてください");
+      const max = type === "timeline" || type === "points" ? 5 : 6;
+      if ((items.length === 0 && type !== "narration") || items.length > max) fail(where, `「項目」は1〜${max}個で書いてください`);
       const times = spread(items.length);
       sc.items = items.map((it, k) => {
         const w = `${where} 項目${k + 1}`;
@@ -294,7 +317,8 @@ const buildEpisode = (file) => {
   };
 
   events.sort((a, b) => a.frame - b.frame);
-  return { id, title: String(raw.タイトル ?? id), fps: FPS, hold: HOLD, stampLand: STAMP_LAND, style, audio, scenes, events, thumb, totalFrames: start };
+  if (chapters.length && chapters[0].frame > 0) chapters.unshift({ title: "オープニング", frame: 0, no: 0 });
+  return { id, title: String(raw.タイトル ?? id), wide, chapters, fps: FPS, hold: HOLD, stampLand: STAMP_LAND, style, audio, scenes, events, thumb, totalFrames: start };
 };
 
 const files = readdirSync(DIR).filter((x) => x.endsWith(".yaml")).sort();

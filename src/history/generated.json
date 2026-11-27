@@ -1,7 +1,810 @@
 [
  {
+  "id": "long-sample",
+  "title": "長尺サンプル「小野妹子の真実」",
+  "wide": true,
+  "chapters": [
+   {
+    "title": "オープニング",
+    "frame": 0,
+    "no": 0
+   },
+   {
+    "title": "名前の誤解",
+    "frame": 330,
+    "no": 1
+   },
+   {
+    "title": "遣隋使の旅",
+    "frame": 3450,
+    "no": 2
+   },
+   {
+    "title": "国書と皇帝",
+    "frame": 7770,
+    "no": 3
+   },
+   {
+    "title": "もしもの歴史",
+    "frame": 10740,
+    "no": 4
+   },
+   {
+    "title": "結論",
+    "frame": 12210,
+    "no": 5
+   }
+  ],
+  "fps": 30,
+  "hold": 9,
+  "stampLand": 7,
+  "style": {
+   "particles": "keitai",
+   "transition": "keitai",
+   "tagBg": "#7A5E3A",
+   "tagColor": "#F4ECDA",
+   "night": false,
+   "hero": {
+    "kind": "shotoku",
+    "color": "#2F4B68",
+    "outline": "#C99A3E"
+   }
+  },
+  "audio": {
+   "instrument": "koto",
+   "scale": [
+    62,
+    64,
+    67,
+    69,
+    71,
+    74,
+    76,
+    79
+   ],
+   "tempo": 58,
+   "pad": true,
+   "bells": false,
+   "gong": true,
+   "lufs": -28
+  },
+  "scenes": [
+   {
+    "id": "seg1",
+    "type": "hook",
+    "start": 0,
+    "frames": 150,
+    "label": "フック",
+    "stamps": [
+     {
+      "text": "男性？",
+      "at": -7,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "note": {
+     "text": "教科書の名前、誤解していませんか",
+     "at": 77,
+     "bg": "#211D1A"
+    },
+    "parts": [],
+    "big": [
+     "「妹子」は女性？",
+     "実は男性の外交官"
+    ]
+   },
+   {
+    "id": "seg2",
+    "type": "title",
+    "start": 150,
+    "frames": 180,
+    "label": "タイトル",
+    "stamps": [],
+    "parts": [],
+    "big": [
+     "小野妹子の真実",
+     "遣隋使と対等の国書"
+    ]
+   },
+   {
+    "id": "seg3",
+    "type": "chapter",
+    "start": 330,
+    "frames": 120,
+    "label": "章",
+    "stamps": [],
+    "parts": [],
+    "chapterNo": 1,
+    "chapterTitle": "名前の誤解"
+   },
+   {
+    "id": "seg4",
+    "type": "intro",
+    "start": 450,
+    "frames": 1200,
+    "label": "紹介",
+    "heading": "推古朝の外交官",
+    "stamps": [
+     {
+      "text": "男性",
+      "at": 893,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "parts": [],
+    "name": {
+     "big": "小野妹子",
+     "reading": "おののいもこ",
+     "note": "近江の小野氏の出身",
+     "at": [
+      10,
+      30,
+      44
+     ]
+    }
+   },
+   {
+    "id": "seg5",
+    "type": "narration",
+    "start": 1650,
+    "frames": 1800,
+    "label": "語り",
+    "heading": "「子」は男性の名にも",
+    "stamps": [],
+    "parts": [
+     {
+      "name": "cap",
+      "x": 1500,
+      "y": 860,
+      "s": 3,
+      "at": 1200
+     }
+    ],
+    "items": [
+     {
+      "text": "古代の「子」は男女とも使った",
+      "at": 12
+     },
+     {
+      "text": "蘇我馬子も男性",
+      "at": 767
+     },
+     {
+      "text": "中臣鎌子（のちの鎌足）も男性",
+      "at": 1522
+     }
+    ]
+   },
+   {
+    "id": "seg6",
+    "type": "chapter",
+    "start": 3450,
+    "frames": 120,
+    "label": "章",
+    "stamps": [],
+    "parts": [],
+    "chapterNo": 2,
+    "chapterTitle": "遣隋使の旅"
+   },
+   {
+    "id": "seg7",
+    "type": "timeline",
+    "start": 3570,
+    "frames": 1200,
+    "label": "年表",
+    "heading": "遣隋使のあゆみ",
+    "stamps": [],
+    "parts": [],
+    "items": [
+     {
+      "year": "600年",
+      "text": "最初の遣隋使（隋書）",
+      "at": 12
+     },
+     {
+      "year": "607年",
+      "text": "妹子が国書を届ける",
+      "at": 345
+     },
+     {
+      "year": "608年",
+      "text": "隋の使いと帰国",
+      "at": 679
+     },
+     {
+      "year": "608年",
+      "text": "留学生と再び隋へ",
+      "at": 1012
+     }
+    ]
+   },
+   {
+    "id": "seg8",
+    "type": "map",
+    "start": 4770,
+    "frames": 1200,
+    "label": "地図",
+    "heading": "難波から海へ",
+    "stamps": [],
+    "note": {
+     "text": "この先、海を渡って隋の都へ",
+     "at": 655,
+     "bg": "#211D1A"
+    },
+    "parts": [
+     {
+      "name": "boat",
+      "x": 900,
+      "y": 900,
+      "s": 0.9,
+      "at": 600
+     }
+    ],
+    "places": [
+     {
+      "name": "難波",
+      "lon": 135.5,
+      "lat": 34.68,
+      "at": 16
+     },
+     {
+      "name": "筑紫",
+      "lon": 130.4,
+      "lat": 33.6,
+      "at": 833
+     }
+    ],
+    "route": true
+   },
+   {
+    "id": "seg9",
+    "type": "narration",
+    "start": 5970,
+    "frames": 1800,
+    "label": "語り",
+    "heading": "命がけの船旅",
+    "stamps": [],
+    "parts": [
+     {
+      "name": "boat",
+      "x": 1500,
+      "y": 860,
+      "s": 1.1,
+      "at": 0
+     }
+    ],
+    "items": [
+     {
+      "text": "隋の都は大興城（長安）",
+      "at": 12
+     },
+     {
+      "text": "海を渡る危険な旅",
+      "at": 767
+     },
+     {
+      "text": "608年には留学生も同行",
+      "at": 1522
+     }
+    ]
+   },
+   {
+    "id": "seg10",
+    "type": "chapter",
+    "start": 7770,
+    "frames": 120,
+    "label": "章",
+    "stamps": [],
+    "parts": [],
+    "chapterNo": 3,
+    "chapterTitle": "国書と皇帝"
+   },
+   {
+    "id": "seg11",
+    "type": "compare",
+    "start": 7890,
+    "frames": 1350,
+    "label": "対比",
+    "heading": "二つの記録",
+    "stamps": [
+     {
+      "text": "食い違い",
+      "at": 893,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "parts": [],
+    "left": {
+     "heading": "日本書紀",
+     "items": [
+      "返書を百済で",
+      "奪われたと報告"
+     ],
+     "color": "#7A5E3A",
+     "texture": "record",
+     "at": 10
+    },
+    "right": {
+     "heading": "隋書",
+     "items": [
+      "皇帝・煬帝は",
+      "国書を「無礼」とした"
+     ],
+     "color": "#C2412D",
+     "at": 40
+    }
+   },
+   {
+    "id": "seg12",
+    "type": "narration",
+    "start": 9240,
+    "frames": 1500,
+    "label": "語り",
+    "heading": "「日出づる処の天子」",
+    "stamps": [],
+    "parts": [
+     {
+      "name": "letter",
+      "x": 1700,
+      "y": 820,
+      "s": 0.5,
+      "at": 60
+     }
+    ],
+    "items": [
+     {
+      "text": "対等の書き方に皇帝は不快",
+      "at": 12
+     },
+     {
+      "text": "それでも翌年、隋は使いを送った",
+      "at": 640
+     },
+     {
+      "text": "高句麗との戦いを控えていたとされる",
+      "at": 1267
+     }
+    ]
+   },
+   {
+    "id": "seg13",
+    "type": "chapter",
+    "start": 10740,
+    "frames": 120,
+    "label": "章",
+    "stamps": [],
+    "parts": [],
+    "chapterNo": 4,
+    "chapterTitle": "もしもの歴史"
+   },
+   {
+    "id": "seg14",
+    "type": "ifcase",
+    "start": 10860,
+    "frames": 1350,
+    "label": "IF",
+    "heading": "もしも対等の国書でなかったら",
+    "stamps": [],
+    "parts": [],
+    "fact": [
+     "対等の書き方",
+     "隋の使いが来日",
+     "交流と留学が続く"
+    ],
+    "what": [
+     "へりくだった国書",
+     "冊封の一国に？",
+     "独自の国づくりは？"
+    ],
+    "factAt": [
+     10,
+     240,
+     469
+    ],
+    "whatAt": [
+     536,
+     737,
+     938
+    ]
+   },
+   {
+    "id": "seg15",
+    "type": "chapter",
+    "start": 12210,
+    "frames": 120,
+    "label": "章",
+    "stamps": [],
+    "parts": [],
+    "chapterNo": 5,
+    "chapterTitle": "結論"
+   },
+   {
+    "id": "seg16",
+    "type": "verdict",
+    "start": 12330,
+    "frames": 600,
+    "label": "判定",
+    "stamps": [],
+    "note": {
+     "text": "古代の「子」は男性の名にも使われた",
+     "at": 325,
+     "bg": "#211D1A"
+    },
+    "parts": [],
+    "verdict": [
+     "妹子は男性",
+     "対等外交の担い手"
+    ],
+    "verdictAt": 2,
+    "gold": "確実",
+    "goldAt": 24
+   },
+   {
+    "id": "seg17",
+    "type": "summary",
+    "start": 12930,
+    "frames": 900,
+    "label": "まとめ",
+    "stamps": [],
+    "parts": [],
+    "items": [
+     {
+      "text": "妹子は男性の外交官",
+      "at": 12
+     },
+     {
+      "text": "607年・608年に隋へ渡った",
+      "at": 260
+     },
+     {
+      "text": "対等の国書を届けた",
+      "at": 509
+     },
+     {
+      "text": "返書をなくした真相は謎のまま",
+      "at": 757
+     }
+    ]
+   },
+   {
+    "id": "seg18",
+    "type": "choice",
+    "start": 13830,
+    "frames": 300,
+    "label": "二択",
+    "stamps": [],
+    "parts": [],
+    "a": [
+     "名前で",
+     "誤解してた派"
+    ],
+    "b": [
+     "知ってた",
+     "派"
+    ]
+   },
+   {
+    "id": "seg19",
+    "type": "subscribe",
+    "start": 14130,
+    "frames": 240,
+    "label": "登録",
+    "stamps": [
+     {
+      "text": "お願いします",
+      "at": 52,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "parts": [],
+    "clickAt": 46
+   }
+  ],
+  "events": [
+   {
+    "kind": "stamp",
+    "frame": 0,
+    "seg": "seg1"
+   },
+   {
+    "kind": "hook",
+    "frame": 0,
+    "seg": "seg1"
+   },
+   {
+    "kind": "transition",
+    "frame": 150,
+    "seg": "seg2"
+   },
+   {
+    "kind": "transition",
+    "frame": 330,
+    "seg": "seg3"
+   },
+   {
+    "kind": "transition",
+    "frame": 450,
+    "seg": "seg4"
+   },
+   {
+    "kind": "stamp",
+    "frame": 1350,
+    "seg": "seg4"
+   },
+   {
+    "kind": "transition",
+    "frame": 1650,
+    "seg": "seg5"
+   },
+   {
+    "kind": "place",
+    "frame": 1662,
+    "seg": "seg5"
+   },
+   {
+    "kind": "place",
+    "frame": 2417,
+    "seg": "seg5"
+   },
+   {
+    "kind": "place",
+    "frame": 3172,
+    "seg": "seg5"
+   },
+   {
+    "kind": "transition",
+    "frame": 3450,
+    "seg": "seg6"
+   },
+   {
+    "kind": "transition",
+    "frame": 3570,
+    "seg": "seg7"
+   },
+   {
+    "kind": "place",
+    "frame": 3582,
+    "seg": "seg7"
+   },
+   {
+    "kind": "place",
+    "frame": 3915,
+    "seg": "seg7"
+   },
+   {
+    "kind": "place",
+    "frame": 4249,
+    "seg": "seg7"
+   },
+   {
+    "kind": "place",
+    "frame": 4582,
+    "seg": "seg7"
+   },
+   {
+    "kind": "transition",
+    "frame": 4770,
+    "seg": "seg8"
+   },
+   {
+    "kind": "place",
+    "frame": 4786,
+    "seg": "seg8"
+   },
+   {
+    "kind": "place",
+    "frame": 5603,
+    "seg": "seg8"
+   },
+   {
+    "kind": "transition",
+    "frame": 5970,
+    "seg": "seg9"
+   },
+   {
+    "kind": "place",
+    "frame": 5982,
+    "seg": "seg9"
+   },
+   {
+    "kind": "place",
+    "frame": 6737,
+    "seg": "seg9"
+   },
+   {
+    "kind": "place",
+    "frame": 7492,
+    "seg": "seg9"
+   },
+   {
+    "kind": "transition",
+    "frame": 7770,
+    "seg": "seg10"
+   },
+   {
+    "kind": "transition",
+    "frame": 7890,
+    "seg": "seg11"
+   },
+   {
+    "kind": "place",
+    "frame": 7900,
+    "seg": "seg11"
+   },
+   {
+    "kind": "place",
+    "frame": 7930,
+    "seg": "seg11"
+   },
+   {
+    "kind": "stamp",
+    "frame": 8790,
+    "seg": "seg11"
+   },
+   {
+    "kind": "transition",
+    "frame": 9240,
+    "seg": "seg12"
+   },
+   {
+    "kind": "place",
+    "frame": 9252,
+    "seg": "seg12"
+   },
+   {
+    "kind": "place",
+    "frame": 9880,
+    "seg": "seg12"
+   },
+   {
+    "kind": "place",
+    "frame": 10507,
+    "seg": "seg12"
+   },
+   {
+    "kind": "transition",
+    "frame": 10740,
+    "seg": "seg13"
+   },
+   {
+    "kind": "transition",
+    "frame": 10860,
+    "seg": "seg14"
+   },
+   {
+    "kind": "place",
+    "frame": 10870,
+    "seg": "seg14"
+   },
+   {
+    "kind": "place",
+    "frame": 11100,
+    "seg": "seg14"
+   },
+   {
+    "kind": "place",
+    "frame": 11329,
+    "seg": "seg14"
+   },
+   {
+    "kind": "place",
+    "frame": 11396,
+    "seg": "seg14"
+   },
+   {
+    "kind": "place",
+    "frame": 11597,
+    "seg": "seg14"
+   },
+   {
+    "kind": "place",
+    "frame": 11798,
+    "seg": "seg14"
+   },
+   {
+    "kind": "transition",
+    "frame": 12210,
+    "seg": "seg15"
+   },
+   {
+    "kind": "transition",
+    "frame": 12330,
+    "seg": "seg16"
+   },
+   {
+    "kind": "stamp",
+    "frame": 12339,
+    "seg": "seg16"
+   },
+   {
+    "kind": "ting",
+    "frame": 12360,
+    "seg": "seg16"
+   },
+   {
+    "kind": "transition",
+    "frame": 12930,
+    "seg": "seg17"
+   },
+   {
+    "kind": "place",
+    "frame": 12942,
+    "seg": "seg17"
+   },
+   {
+    "kind": "place",
+    "frame": 13190,
+    "seg": "seg17"
+   },
+   {
+    "kind": "place",
+    "frame": 13439,
+    "seg": "seg17"
+   },
+   {
+    "kind": "place",
+    "frame": 13687,
+    "seg": "seg17"
+   },
+   {
+    "kind": "transition",
+    "frame": 13830,
+    "seg": "seg18"
+   },
+   {
+    "kind": "place",
+    "frame": 13842,
+    "seg": "seg18"
+   },
+   {
+    "kind": "place",
+    "frame": 13852,
+    "seg": "seg18"
+   },
+   {
+    "kind": "transition",
+    "frame": 14130,
+    "seg": "seg19"
+   },
+   {
+    "kind": "click",
+    "frame": 14176,
+    "seg": "seg19"
+   },
+   {
+    "kind": "stamp",
+    "frame": 14189,
+    "seg": "seg19"
+   }
+  ],
+  "thumb": {
+   "lines": [
+    "小野妹子の",
+    "真実"
+   ],
+   "stamp": "男性？",
+   "parts": [
+    {
+     "name": "boat",
+     "x": 1180,
+     "y": 900,
+     "s": 1.2,
+     "at": 0
+    }
+   ],
+   "person": true
+  },
+  "totalFrames": 14370
+ },
+ {
   "id": "sample",
   "title": "サンプル「小野妹子は女性だったのか」",
+  "wide": false,
+  "chapters": [],
   "fps": 30,
   "hold": 9,
   "stampLand": 7,
