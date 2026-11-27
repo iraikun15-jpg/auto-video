@@ -167,6 +167,7 @@ const buildEpisode = (file) => {
           `「${what}」というポーズ・動き・演出はありません。\n  ポーズ: ${list(NAMES.poses)}\n  動き: ${list(NAMES.motions)}${Object.keys(NAMES.effects).length ? `\n  演出: ${list(NAMES.effects)}` : ""}`,
         );
       if (who === "画面" && kind !== "effect") fail(w, "「画面」に付けられるのは演出だけです");
+      if (who === "画面" && !["focus", "shake", "flash", "dim"].includes(code)) fail(w, `「${what}」は人物に付ける演出です。「画面」に付けられるのは 集中線・揺れ・フラッシュ・暗くなる`);
       if ((code === "walk" || code === "run") && opts.to === undefined) fail(w, `「${what}」には行き先の「到着: x座標」が必要です（例: { 到着: 700 }）`);
       actions.push({ who, start: frame, kind, code, seg: si, opts });
     });

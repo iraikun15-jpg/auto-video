@@ -5,7 +5,8 @@
 import React, { useMemo } from "react";
 import { AbsoluteFill, Easing, Series, useCurrentFrame } from "remotion";
 import { jitter, track } from "../rig/pose";
-import { StickFigure } from "../rig/StickFigure";
+import { solve, StickFigure } from "../rig/StickFigure";
+import { Anchor, CharacterEffect, Dim, EFFECT_DUR, Flash, FocusLines, SCREEN_EFFECTS, screenShake } from "./effects";
 import { BG, BOSS_RED, FONT, INK } from "../rig/theme";
 import { Backgrounds, PropView } from "./scenery";
 import { characterAt, prepare } from "./timeline";
@@ -55,24 +56,54 @@ const BigText: React.FC<{ item: TextItem; f: number; animate: boolean }> = ({ it
 const Scene: React.FC<{ ep: Episode; f: number; texts: TextItem[]; animateText: boolean }> = ({ ep, f, texts, animateText }) => {
   const prep = useMemo(() => prepare(ep), [ep]);
   const Bg = Backgrounds[ep.background] ?? Backgrounds.floor;
+  const states = Object.fromEntries(Object.keys(ep.cast).map((name) => [name, characterAt(ep, prep, name, f)]));
+  const anchor = (who: string): Anchor => {
+    const s = states[who];
+    return s && s.visible ? { j: solve(s.pose, s.facing), facing: s.facing } : null;
+  };
+
+  // いま出ている演出
+  const active = ep.actions
+    .filter((a) => a.kind === "effect")
+    .map((a) => ({ a, t: f - a.start, dur: a.opts.dur ?? EFFECT_DUR[a.code] ?? 30 }))
+    .filter(({ t, dur }) => t >= 0 && t < dur);
+  const screen = (code: string) => active.filter((e) => e.a.code === code);
+  const [sx, sy] = screenShake(screen("shake"));
+
   return (
     <AbsoluteFill style={{ backgroundColor: BG }}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
-        <Bg />
-        {ep.props.filter((p) => !p.front).map((p, i) => (
-          <PropView key={`b${i}`} item={p} f={f} />
-        ))}
-        {Object.keys(ep.cast).map((name) => {
-          const c = ep.cast[name];
-          const s = characterAt(ep, prep, name, f);
-          if (!s.visible) return null;
-          return <StickFigure key={name} pose={s.pose} facing={s.facing} color={COLORS[c.color]} tie={c.tie} />;
-        })}
-        {ep.props.filter((p) => p.front).map((p, i) => (
-          <PropView key={`f${i}`} item={p} f={f} />
-        ))}
-        {texts.map((t, i) => (
-          <BigText key={i} item={t} f={f} animate={animateText} />
+        <g transform={`translate(${sx} ${sy})`}>
+          <Bg />
+          {ep.props.filter((p) => !p.front).map((p, i) => (
+            <PropView key={`b${i}`} item={p} f={f} />
+          ))}
+          {screen("dim").map((e, i) => (
+            <Dim key={`dim${e.a.start}-${i}`} t={e.t} dur={e.dur} power={e.a.opts.power} />
+          ))}
+          {screen("focus").map((e, i) => (
+            <FocusLines key={`focus${e.a.start}-${i}`} t={e.t} dur={e.dur} a={e.a} at={anchor(e.a.who)} />
+          ))}
+          {Object.keys(ep.cast).map((name) => {
+            const c = ep.cast[name];
+            const s = states[name];
+            if (!s.visible) return null;
+            return <StickFigure key={name} pose={s.pose} facing={s.facing} color={COLORS[c.color]} tie={c.tie} />;
+          })}
+          {ep.props.filter((p) => p.front).map((p, i) => (
+            <PropView key={`f${i}`} item={p} f={f} />
+          ))}
+          {active
+            .filter((e) => !SCREEN_EFFECTS.has(e.a.code) && e.a.code !== "focus")
+            .map((e, i) => (
+              <CharacterEffect key={`fx${e.a.start}-${i}`} t={e.t} dur={e.dur} a={e.a} at={anchor(e.a.who)} />
+            ))}
+          {texts.map((t, i) => (
+            <BigText key={i} item={t} f={f} animate={animateText} />
+          ))}
+        </g>
+        {screen("flash").map((e, i) => (
+          <Flash key={`flash${e.a.start}-${i}`} t={e.t} dur={e.dur} />
         ))}
       </svg>
     </AbsoluteFill>

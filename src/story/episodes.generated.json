@@ -1,5 +1,489 @@
 [
  {
+  "id": "effects-demo",
+  "title": "演出の見本",
+  "release": false,
+  "fps": 30,
+  "hold": 9,
+  "background": "floor",
+  "props": [],
+  "cast": {
+   "主人公": {
+    "color": "ink",
+    "tie": false,
+    "x": 540,
+    "facing": 1,
+    "pose": "STAND",
+    "always": true
+   }
+  },
+  "segments": [
+   {
+    "id": "e01",
+    "label": "",
+    "script": "",
+    "start": 0,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 0,
+      "end": 45,
+      "text": "汗",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e02",
+    "label": "",
+    "script": "",
+    "start": 45,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 45,
+      "end": 90,
+      "text": "冷や汗",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e03",
+    "label": "",
+    "script": "",
+    "start": 90,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 90,
+      "end": 135,
+      "text": "びっくり",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e04",
+    "label": "",
+    "script": "",
+    "start": 135,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 135,
+      "end": 180,
+      "text": "はてな",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e05",
+    "label": "",
+    "script": "",
+    "start": 180,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 180,
+      "end": 225,
+      "text": "怒り",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e06",
+    "label": "",
+    "script": "",
+    "start": 225,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 225,
+      "end": 270,
+      "text": "衝撃",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e07",
+    "label": "",
+    "script": "",
+    "start": 270,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 270,
+      "end": 315,
+      "text": "ドキドキ",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e08",
+    "label": "",
+    "script": "",
+    "start": 315,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 315,
+      "end": 360,
+      "text": "キラキラ",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e09",
+    "label": "",
+    "script": "",
+    "start": 360,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 360,
+      "end": 405,
+      "text": "どんより",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e10",
+    "label": "",
+    "script": "",
+    "start": 405,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 405,
+      "end": 450,
+      "text": "集中線",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e11",
+    "label": "",
+    "script": "",
+    "start": 450,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 450,
+      "end": 495,
+      "text": "揺れ",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e12",
+    "label": "",
+    "script": "",
+    "start": 495,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 495,
+      "end": 540,
+      "text": "フラッシュ",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   },
+   {
+    "id": "e13",
+    "label": "",
+    "script": "",
+    "start": 540,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 540,
+      "end": 585,
+      "text": "暗くなる",
+      "place": "上",
+      "color": "ink"
+     }
+    ]
+   }
+  ],
+  "actions": [
+   {
+    "who": "主人公",
+    "start": 0,
+    "kind": "pose",
+    "code": "SURPRISED",
+    "seg": 0,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 0,
+    "kind": "effect",
+    "code": "sweat",
+    "seg": 0,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 45,
+    "kind": "pose",
+    "code": "SLUMP",
+    "seg": 1,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 45,
+    "kind": "effect",
+    "code": "coldsweat",
+    "seg": 1,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 90,
+    "kind": "pose",
+    "code": "SURPRISED",
+    "seg": 2,
+    "opts": {
+     "ease": "ため"
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 90,
+    "kind": "effect",
+    "code": "surprise",
+    "seg": 2,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 135,
+    "kind": "pose",
+    "code": "THINK",
+    "seg": 3,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 135,
+    "kind": "effect",
+    "code": "question",
+    "seg": 3,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 180,
+    "kind": "pose",
+    "code": "HANDS_ON_HIPS",
+    "seg": 4,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 180,
+    "kind": "effect",
+    "code": "anger",
+    "seg": 4,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 225,
+    "kind": "pose",
+    "code": "SURPRISED",
+    "seg": 5,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 225,
+    "kind": "effect",
+    "code": "shock",
+    "seg": 5,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 270,
+    "kind": "pose",
+    "code": "STAND",
+    "seg": 6,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 270,
+    "kind": "effect",
+    "code": "heart",
+    "seg": 6,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 315,
+    "kind": "pose",
+    "code": "BANZAI",
+    "seg": 7,
+    "opts": {
+     "ease": "はずむ"
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 315,
+    "kind": "effect",
+    "code": "sparkle",
+    "seg": 7,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 360,
+    "kind": "pose",
+    "code": "SLUMP",
+    "seg": 8,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 360,
+    "kind": "effect",
+    "code": "gloom",
+    "seg": 8,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 405,
+    "kind": "pose",
+    "code": "SURPRISED",
+    "seg": 9,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 405,
+    "kind": "effect",
+    "code": "focus",
+    "seg": 9,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 450,
+    "kind": "pose",
+    "code": "HEAD_IN_HANDS",
+    "seg": 10,
+    "opts": {}
+   },
+   {
+    "who": "画面",
+    "start": 453,
+    "kind": "effect",
+    "code": "shake",
+    "seg": 10,
+    "opts": {
+     "dur": 36
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 495,
+    "kind": "pose",
+    "code": "SURPRISED",
+    "seg": 11,
+    "opts": {}
+   },
+   {
+    "who": "画面",
+    "start": 498,
+    "kind": "effect",
+    "code": "flash",
+    "seg": 11,
+    "opts": {
+     "dur": 15
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 540,
+    "kind": "pose",
+    "code": "ORZ",
+    "seg": 12,
+    "opts": {}
+   },
+   {
+    "who": "画面",
+    "start": 540,
+    "kind": "effect",
+    "code": "dim",
+    "seg": 12,
+    "opts": {
+     "dur": 42
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 540,
+    "kind": "effect",
+    "code": "gloom",
+    "seg": 12,
+    "opts": {
+     "dur": 42
+    }
+   }
+  ],
+  "thumbnail": {
+   "frame": 0,
+   "texts": []
+  },
+  "totalFrames": 585
+ },
+ {
   "id": "sample",
   "title": "サンプル「定時ダッシュ」",
   "release": false,
@@ -95,6 +579,16 @@
    },
    {
     "who": "主人公",
+    "start": 51,
+    "kind": "effect",
+    "code": "sparkle",
+    "seg": 0,
+    "opts": {
+     "dur": 30
+    }
+   },
+   {
+    "who": "主人公",
     "start": 90,
     "kind": "pose",
     "code": "STAND",
@@ -139,11 +633,37 @@
    },
    {
     "who": "主人公",
+    "start": 156,
+    "kind": "effect",
+    "code": "surprise",
+    "seg": 1,
+    "opts": {}
+   },
+   {
+    "who": "画面",
+    "start": 156,
+    "kind": "effect",
+    "code": "shake",
+    "seg": 1,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
     "start": 162,
     "kind": "motion",
     "code": "tremble",
     "seg": 1,
     "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 165,
+    "kind": "effect",
+    "code": "sweat",
+    "seg": 1,
+    "opts": {
+     "dur": 36
+    }
    },
    {
     "who": "主人公",
@@ -163,6 +683,26 @@
     "seg": 2,
     "opts": {
      "times": 2
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 219,
+    "kind": "effect",
+    "code": "gloom",
+    "seg": 2,
+    "opts": {
+     "dur": 72
+    }
+   },
+   {
+    "who": "画面",
+    "start": 219,
+    "kind": "effect",
+    "code": "dim",
+    "seg": 2,
+    "opts": {
+     "dur": 72
     }
    },
    {

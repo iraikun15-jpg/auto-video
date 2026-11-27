@@ -48,7 +48,21 @@
     "登場": "enter",
     "退場": "exit"
   },
-  "effects": {},
+  "effects": {
+    "汗": "sweat",
+    "冷や汗": "coldsweat",
+    "びっくり": "surprise",
+    "はてな": "question",
+    "怒り": "anger",
+    "衝撃": "shock",
+    "ドキドキ": "heart",
+    "キラキラ": "sparkle",
+    "どんより": "gloom",
+    "集中線": "focus",
+    "揺れ": "shake",
+    "フラッシュ": "flash",
+    "暗くなる": "dim"
+  },
   "props": {
     "机": "desk",
     "椅子": "chair",

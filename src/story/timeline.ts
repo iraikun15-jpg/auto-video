@@ -37,7 +37,7 @@ export const prepare = (ep: Episode) => {
   for (const name of Object.keys(ep.cast)) by[name] = { base: [], overlay: [], first: Infinity, exits: [], enters: [] };
   for (const a of ep.actions) {
     const c = by[a.who];
-    if (!c) continue;
+    if (!c || a.kind === "effect") continue;
     c.first = Math.min(c.first, a.start);
     if (isBase(a)) c.base.push(a);
     else if (a.code === "exit") c.exits.push(a);
