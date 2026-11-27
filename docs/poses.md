@@ -1,7 +1,7 @@
 # 棒人間ポーズ集
 
 `src/rig/poses.ts` に、名前付きのポーズと動きの部品をまとめています。
-一覧画像は `PoseCatalog`（静止画）、動きの見本は `MotionDemo`（5秒の動画）です。どちらも Release に入ります。
+一覧画像は `PoseCatalog`（静止画）、動きの見本は `MotionDemo`（5秒の動画）です。Release には載せません（必要なときに `npx remotion still src/index.ts PoseCatalog out/pose_catalog.png` で書き出す）。
 
 ## 指示ファイルでの指定のしかた（例）
 
