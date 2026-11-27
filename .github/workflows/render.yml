@@ -1,9 +1,8 @@
 name: Render video
 
+# 依頼者はチャットで受け取った動画を PC に保存する運用なので、push での自動書き出しはしない。
+# 必要なときだけ GitHub の Actions 画面から手動で実行する。
 on:
-  push:
-    paths-ignore:
-      - "**.md"
   workflow_dispatch:
 
 permissions:
@@ -31,10 +30,10 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install Japanese fonts
+      - name: Install Japanese fonts and ffmpeg (for frame check)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk ffmpeg
 
       - name: Install dependencies
         run: npm ci
@@ -42,16 +41,64 @@ jobs:
       - name: Render episode 2
         run: |
           npm run render
-          cp out/ep2/ep2_full.mp4 out/video.mp4
           cat out/ep2/ep2_timing.md >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Render episodes from script files
-        # episodes/*.yaml のうち「公開: true」の回だけ書き出す
+      - name: Render history ch. Jimmu short (paper cutout)
         run: |
-          for id in $(node scripts/build-episodes.mjs --list); do
-            node scripts/render-episode.mjs "$id"
-            cat "out/$id/${id}_timing.md" >> "$GITHUB_STEP_SUMMARY"
-          done
+          START=$(date +%s)
+          npm run render:jimmu
+          cat out/jimmu/jimmu_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 神武東征 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Yamato Takeru short (with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:takeru
+          cat out/takeru/takeru_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### ヤマトタケル Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Sujin short (with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:sujin
+          cat out/sujin/sujin_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 崇神 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Kusanagi short (mythic fantasy, with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:kusanagi
+          cat out/kusanagi/kusanagi_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 草薙剣 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Yuryaku short (with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:yuryaku
+          cat out/yuryaku/yuryaku_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 雄略 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Himiko short (with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:himiko
+          cat out/himiko/himiko_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 卑弥呼 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Keitai short (with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:keitai
+          cat out/keitai/keitai_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 継体 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render history ch. Izumo short (with BGM and SFX)
+        run: |
+          START=$(date +%s)
+          npm run render:izumo
+          cp out/izumo/izumo_full.mp4 out/video.mp4
+          cat out/izumo/izumo_timing.md >> "$GITHUB_STEP_SUMMARY"
+          echo "### 出雲 Short: レンダリング $(( $(date +%s) - START )) 秒" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Render low-poly 3D test
         run: |
@@ -75,13 +122,11 @@ jobs:
         run: |
           TAG="video-${{ github.run_number }}"
           SHORT_SHA="${GITHUB_SHA::7}"
-          EPISODE_FILES=$(for id in $(node scripts/build-episodes.mjs --list); do ls out/$id/*; done)
           gh release create "$TAG" \
-            $EPISODE_FILES \
-            out/video.mp4 out/ep2/* out/kaiju_test.mp4 out/kaiju_test_v2.mp4 out/kaiju_v4.mp4 \
+            out/video.mp4 out/izumo/* out/keitai/* out/himiko/* out/yuryaku/* out/kusanagi/* out/sujin/* out/takeru/* out/jimmu/* out/ep2/* out/kaiju_test.mp4 out/kaiju_test_v2.mp4 out/kaiju_v4.mp4 \
             --target "$GITHUB_SHA" \
             --title "動画 #${{ github.run_number }} (${GITHUB_REF_NAME} @ ${SHORT_SHA})" \
-            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした第2話（無音）です。video.mp4 と ep2_full.mp4 は同じ結合版、ep2_seg1〜5 はセグメント別、ep2_timing.md はタイミング表、kaiju_test.mp4 / kaiju_test_v2.mp4 はローポリ3Dテスト（v1/v2）、kaiju_v4.mp4 は本編テスト v4（東京破壊・音あり）です。" \
+            --notes "ブランチ \`${GITHUB_REF_NAME}\` のコミット ${SHORT_SHA} から自動レンダリングした動画です。video.mp4 と izumo_full.mp4 は同じ（もしも日本史ラボ 第8本「出雲の国譲りは本当にあったのか」・BGM と効果音入り・ナレーションなし）、izumo_full_light.mp4 はその軽量版、izumo_thumbnail.png はサムネイル、izumo_timing.md はタイミング表。keitai_* は第7本「継体天皇は実在したのか」、himiko_* は第6本「卑弥呼は実在したのか」、yuryaku_* は第5本「雄略天皇は実在したのか」、kusanagi_* は第4本「草薙剣は本当にあったのか」、sujin_* は第3本「本当の初代天皇は崇神？」、takeru_* は第2本「ヤマトタケルは実在したのか」、jimmu_full.mp4 は第1本「神武天皇は実在したのか」（無音）、jimmu_seg1〜9 はセグメント別、jimmu_thumbnail.png はサムネイル、jimmu_timing.md はタイミング表。ep2_full.mp4 は第2話（無音）の結合版、ep2_seg1〜5 はセグメント別、ep2_timing.md はタイミング表、kaiju_test.mp4 / kaiju_test_v2.mp4 はローポリ3Dテスト（v1/v2）、kaiju_v4.mp4 は本編テスト v4（東京破壊・音あり）です。" \
             --latest
 
       - name: Upload to Google Drive

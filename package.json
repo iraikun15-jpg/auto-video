@@ -9,7 +9,17 @@
     "render:sample": "remotion render src/index.ts ShortVideo out/video.mp4 --codec=h264",
     "typecheck": "tsc --noEmit",
     "episode": "node scripts/render-episode.mjs",
-    "episodes:build": "node scripts/build-episodes.mjs"
+    "episodes:build": "node scripts/build-episodes.mjs",
+    "render:jimmu": "node scripts/render-jimmu.mjs",
+    "render:takeru": "node scripts/render-takeru.mjs",
+    "render:sujin": "node scripts/render-sujin.mjs",
+    "render:kusanagi": "node scripts/render-kusanagi.mjs",
+    "render:yuryaku": "node scripts/render-yuryaku.mjs",
+    "render:himiko": "node scripts/render-himiko.mjs",
+    "render:keitai": "node scripts/render-keitai.mjs",
+    "render:izumo": "node scripts/render-izumo.mjs",
+    "render:suiko": "node scripts/render-suiko.mjs",
+    "render:shotoku": "node scripts/render-shotoku.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",
