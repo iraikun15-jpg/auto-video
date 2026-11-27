@@ -316,6 +316,7 @@ const buildEpisode = (file) => {
     person: th.人物 !== "なし",
   };
 
+  for (const l of thumb.lines) if ([...l].length > 10) console.warn(`△ ${file} サムネイル: 「${l}」は${[...l].length}文字。スマホで読めるよう1行10文字以内がおすすめ`);
   events.sort((a, b) => a.frame - b.frame);
   if (chapters.length && chapters[0].frame > 0) chapters.unshift({ title: "オープニング", frame: 0, no: 0 });
   return { id, title: String(raw.タイトル ?? id), wide, chapters, fps: FPS, hold: HOLD, stampLand: STAMP_LAND, style, audio, scenes, events, thumb, totalFrames: start };
