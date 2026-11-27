@@ -40,6 +40,11 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - 第2話: `src/ep2/`、書き出しは `npm run render`（`scripts/render-ep2.mjs` がフレーム数と無音を検証してタイミング表を作る）
 
 ## 歴史チャンネル（切り絵スタイル）
+- **日本史キット（第11本以降の基本）**: `history/<id>.yaml` に台本を書く → `npm run history -- <id>` で `out/history/<id>/` に結合版（音あり）・軽量版・サムネ・タイミング表。書き方は `docs/history-kit.md`
+  - 場面の型10種（フック・紹介・年表・地図・箇条・対比・IF・判定・二択・登録）、見た目（舞うもの・転換・色・主役）と音（楽器・音階）は名前で選ぶ。回ごとに組み合わせを変える
+  - 仕組み: `scripts/build-history.mjs`（検証・タイミング決め）→ `src/history/scenes.tsx`（型ごとの画面）・`HistoryVideo.tsx`（結合版・サムネ）／`scripts/synth-history.mjs`（BGM・効果音、-28 LUFS に自動でそろえる）／`scripts/render-history.mjs`（書き出しと検品）
+  - 依頼者の指示書を受けたら、まず YAML に書き起こし、型で足りない見せ場だけ部品や専用の場面を足す
+  - `Stage` は `fx`（舞うもの）と `trans`（転換）を別々に指定できる（既存の回は `look` だけで今までどおり）
 - 第1本「神武天皇は実在したのか」Short: `src/jimmu/`、書き出しは `npm run render:jimmu`（`out/jimmu/` に結合版・seg1〜9・サムネ・タイミング表）
 - スタイル: 依頼者が「切り絵（Paper Cutout）＋地図の場面は作戦盤（Tactics Board）」を選んだ。和紙の台紙・藍の海（青海波）・朱/墨/金
   - 部品: `paper.tsx`（台紙・地図・札・判子・駒・ルート・矢）、`figures.tsx`（影絵の人物・八咫烏・日輪）、`geo.ts`（簡略地図・カメラ・ルート）

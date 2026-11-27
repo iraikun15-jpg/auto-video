@@ -43,6 +43,8 @@ const Defs: React.FC<{ f: number }> = ({ f }) => (
   </defs>
 );
 
+export type Look = "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo" | "suiko" | "shotoku";
+
 /** 台紙（和紙の画像）＋SVGキャンバス＋いちばん上に和紙の繊維。children は SVG 要素 */
 export const Stage: React.FC<{
   children: React.ReactNode;
@@ -50,10 +52,15 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo" | "suiko" | "shotoku"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: Look; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
-}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
-  const dark = night ?? (look === "kusanagi" ? 1 : 0);
+  fx?: Look; // 舞うものだけ別の回のものにする（日本史キット用。省略時は look と同じ）
+  trans?: Look; // 場面転換だけ別の回のものにする（同上）
+}> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look: baseLook = "jimmu", night, fx, trans }) => {
+  const dark = night ?? (baseLook === "kusanagi" ? 1 : 0);
+  // 舞うもの・場面転換は別々に選べる（既存の回は look だけ渡すので今までどおり）
+  const fxLook: Look = fx ?? baseLook;
+  const transLook: Look = trans ?? baseLook;
   return (
   <AbsoluteFill style={{ backgroundColor: PAPER_BG }}>
     <Img src={staticFile("jimmu/washi_bg.jpg")} style={{ position: "absolute", width: W, height: H }} />
@@ -80,8 +87,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : look === "suiko" ? <LotusPetals f={f} /> : look === "shotoku" ? <Palmettes f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : look === "suiko" ? <KaniIn f={f} /> : look === "shotoku" ? <HaloIn f={f} /> : <PeelIn f={f} /> : null}
+      {fxLook === "takeru" ? <Feathers f={f} /> : fxLook === "sujin" ? <SugiLeaves f={f} /> : fxLook === "kusanagi" ? <Motes f={f} /> : fxLook === "yuryaku" ? <FloatingGlyphs f={f} /> : fxLook === "himiko" ? <MirrorGlints f={f} /> : fxLook === "keitai" ? <Ripples f={f} /> : fxLook === "izumo" ? <Yakumo f={f} /> : fxLook === "suiko" ? <LotusPetals f={f} /> : fxLook === "shotoku" ? <Palmettes f={f} /> : <Flecks f={f} />}
+      {peel ? transLook === "takeru" ? <ScrollIn f={f} /> : transLook === "sujin" ? <MisuIn f={f} /> : transLook === "kusanagi" ? <SlashIn f={f} /> : transLook === "yuryaku" ? <XrayIn f={f} /> : transLook === "himiko" ? <PageTurnIn f={f} /> : transLook === "keitai" ? <FusumaIn f={f} /> : transLook === "izumo" ? <CloudIn f={f} /> : transLook === "suiko" ? <KaniIn f={f} /> : transLook === "shotoku" ? <HaloIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>

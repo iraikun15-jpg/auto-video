@@ -19,7 +19,8 @@
     "render:keitai": "node scripts/render-keitai.mjs",
     "render:izumo": "node scripts/render-izumo.mjs",
     "render:suiko": "node scripts/render-suiko.mjs",
-    "render:shotoku": "node scripts/render-shotoku.mjs"
+    "render:shotoku": "node scripts/render-shotoku.mjs",
+    "history": "node scripts/render-history.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",

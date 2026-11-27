@@ -6,6 +6,9 @@ import { Ep2Thumbnail } from "./ep2/Thumbnail";
 import { FPS } from "./ep2/common";
 import { MotionDemo, MOTION_DEMO_FRAMES, PoseCatalog } from "./rig/PoseCatalog";
 import episodes from "./story/episodes.generated.json";
+import historyEpisodes from "./history/generated.json";
+import { HistoryThumbnail, HistoryVideo } from "./history/HistoryVideo";
+import type { HEpisode } from "./history/types";
 import { EpisodeFull, EpisodeSegment, EpisodeThumbnail } from "./story/Episode";
 import type { Episode } from "./story/types";
 import { KaijuTest, KAIJU_FRAMES } from "./kaiju/KaijuTest";
@@ -66,6 +69,22 @@ export const RemotionRoot: React.FC = () => {
         />
       ))}
       <Still id="Ep2Thumbnail" component={Ep2Thumbnail} width={1080} height={1920} />
+
+      {/* 日本史キット（history/*.yaml）から作る回。id は h-<台本のファイル名> */}
+      {(historyEpisodes as unknown as HEpisode[]).map((ep) => (
+        <React.Fragment key={`h-${ep.id}`}>
+          <Composition
+            id={`h-${ep.id}`}
+            component={HistoryVideo}
+            width={1080}
+            height={1920}
+            fps={ep.fps}
+            durationInFrames={ep.totalFrames}
+            defaultProps={{ ep, withAudio: true }}
+          />
+          <Still id={`h-${ep.id}-thumbnail`} component={HistoryThumbnail} width={1080} height={1920} defaultProps={{ ep }} />
+        </React.Fragment>
+      ))}
 
       {/* 台本ファイル（episodes/*.yaml）から作る回。id は台本のファイル名 */}
       {(episodes as unknown as Episode[]).map((ep) => (

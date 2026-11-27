@@ -1,0 +1,452 @@
+[
+ {
+  "id": "sample",
+  "title": "サンプル「小野妹子は女性だったのか」",
+  "fps": 30,
+  "hold": 9,
+  "stampLand": 7,
+  "style": {
+   "particles": "suiko",
+   "transition": "takeru",
+   "tagBg": "#2F4B68",
+   "tagColor": "#F4ECDA",
+   "night": false,
+   "hero": {
+    "kind": "shotoku",
+    "color": "#2F4B68",
+    "outline": "#C99A3E"
+   }
+  },
+  "audio": {
+   "instrument": "guqin",
+   "scale": [
+    62,
+    64,
+    66,
+    69,
+    71,
+    74,
+    76,
+    78
+   ],
+   "tempo": 62,
+   "pad": true,
+   "bells": true,
+   "gong": true,
+   "lufs": -28
+  },
+  "scenes": [
+   {
+    "id": "seg1",
+    "type": "hook",
+    "start": 0,
+    "frames": 90,
+    "label": "フック",
+    "stamps": [
+     {
+      "text": "男性？",
+      "at": -7,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "note": {
+     "text": "遣隋使の小野妹子",
+     "at": 44,
+     "bg": "#211D1A"
+    },
+    "parts": [],
+    "big": [
+     "名前に「子」、",
+     "実は男性？"
+    ]
+   },
+   {
+    "id": "seg2",
+    "type": "intro",
+    "start": 90,
+    "frames": 240,
+    "label": "紹介",
+    "heading": "推古朝の外交官",
+    "stamps": [
+     {
+      "text": "男性",
+      "at": 173,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "parts": [],
+    "name": {
+     "big": "小野妹子",
+     "reading": "おののいもこ",
+     "note": "「子」は男性の名にも",
+     "at": [
+      10,
+      30,
+      44
+     ]
+    }
+   },
+   {
+    "id": "seg3",
+    "type": "timeline",
+    "start": 330,
+    "frames": 240,
+    "label": "年表",
+    "heading": "遣隋使のあゆみ",
+    "stamps": [],
+    "note": {
+     "text": "推古天皇・聖徳太子の時代",
+     "at": 127,
+     "bg": "#211D1A"
+    },
+    "parts": [],
+    "items": [
+     {
+      "year": "600年",
+      "text": "最初の遣隋使（隋書）",
+      "at": 12
+     },
+     {
+      "year": "607年",
+      "text": "妹子が国書を届ける",
+      "at": 75
+     },
+     {
+      "year": "608年",
+      "text": "隋の使いと帰国",
+      "at": 138
+     }
+    ]
+   },
+   {
+    "id": "seg4",
+    "type": "map",
+    "start": 570,
+    "frames": 210,
+    "label": "地図",
+    "heading": "都から隋へ",
+    "stamps": [],
+    "note": {
+     "text": "ここから海を渡って隋へ",
+     "at": 110,
+     "bg": "#211D1A"
+    },
+    "parts": [
+     {
+      "name": "boat",
+      "x": 300,
+      "y": 1080,
+      "s": 0.8,
+      "at": 120
+     }
+    ],
+    "places": [
+     {
+      "name": "難波",
+      "lon": 135.5,
+      "lat": 34.68,
+      "at": 16
+     },
+     {
+      "name": "筑紫",
+      "lon": 130.4,
+      "lat": 33.6,
+      "at": 140
+     }
+    ],
+    "route": true
+   },
+   {
+    "id": "seg5",
+    "type": "compare",
+    "start": 780,
+    "frames": 240,
+    "label": "対比",
+    "heading": "二つの記録",
+    "stamps": [
+     {
+      "text": "食い違い",
+      "at": 158,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "parts": [],
+    "left": {
+     "heading": "日本書紀",
+     "items": [
+      "返書を失くした",
+      "と報告"
+     ],
+     "color": "#7A5E3A",
+     "texture": "record",
+     "at": 10
+    },
+    "right": {
+     "heading": "隋書",
+     "items": [
+      "皇帝は国書に",
+      "不快を示した"
+     ],
+     "color": "#C2412D",
+     "at": 40
+    }
+   },
+   {
+    "id": "seg6",
+    "type": "ifcase",
+    "start": 1020,
+    "frames": 240,
+    "label": "IF",
+    "heading": "もしも対等の国書でなかったら",
+    "stamps": [],
+    "parts": [],
+    "fact": [
+     "対等の書き方",
+     "隋の使いが来日",
+     "交流が続く"
+    ],
+    "what": [
+     "へりくだった国書",
+     "冊封の一国に？"
+    ],
+    "factAt": [
+     10,
+     46,
+     81
+    ],
+    "whatAt": [
+     92,
+     161
+    ]
+   },
+   {
+    "id": "seg7",
+    "type": "verdict",
+    "start": 1260,
+    "frames": 180,
+    "label": "判定",
+    "stamps": [],
+    "note": {
+     "text": "古代の「子」は男性の名にも使われた",
+     "at": 94,
+     "bg": "#211D1A"
+    },
+    "parts": [],
+    "verdict": [
+     "妹子は男性",
+     "名前で誤解されがち"
+    ],
+    "verdictAt": 2,
+    "gold": "確実",
+    "goldAt": 24
+   },
+   {
+    "id": "seg8",
+    "type": "choice",
+    "start": 1440,
+    "frames": 150,
+    "label": "二択",
+    "stamps": [],
+    "parts": [],
+    "a": [
+     "女性だと",
+     "思ってた派"
+    ],
+    "b": [
+     "知ってた",
+     "派"
+    ]
+   },
+   {
+    "id": "seg9",
+    "type": "subscribe",
+    "start": 1590,
+    "frames": 150,
+    "label": "登録",
+    "stamps": [
+     {
+      "text": "お願いします",
+      "at": 52,
+      "round": false,
+      "color": "#C2412D"
+     }
+    ],
+    "parts": [],
+    "clickAt": 46
+   }
+  ],
+  "events": [
+   {
+    "kind": "stamp",
+    "frame": 0,
+    "seg": "seg1"
+   },
+   {
+    "kind": "hook",
+    "frame": 0,
+    "seg": "seg1"
+   },
+   {
+    "kind": "transition",
+    "frame": 90,
+    "seg": "seg2"
+   },
+   {
+    "kind": "stamp",
+    "frame": 270,
+    "seg": "seg2"
+   },
+   {
+    "kind": "transition",
+    "frame": 330,
+    "seg": "seg3"
+   },
+   {
+    "kind": "place",
+    "frame": 342,
+    "seg": "seg3"
+   },
+   {
+    "kind": "place",
+    "frame": 405,
+    "seg": "seg3"
+   },
+   {
+    "kind": "place",
+    "frame": 468,
+    "seg": "seg3"
+   },
+   {
+    "kind": "transition",
+    "frame": 570,
+    "seg": "seg4"
+   },
+   {
+    "kind": "place",
+    "frame": 586,
+    "seg": "seg4"
+   },
+   {
+    "kind": "place",
+    "frame": 710,
+    "seg": "seg4"
+   },
+   {
+    "kind": "transition",
+    "frame": 780,
+    "seg": "seg5"
+   },
+   {
+    "kind": "place",
+    "frame": 790,
+    "seg": "seg5"
+   },
+   {
+    "kind": "place",
+    "frame": 820,
+    "seg": "seg5"
+   },
+   {
+    "kind": "stamp",
+    "frame": 945,
+    "seg": "seg5"
+   },
+   {
+    "kind": "transition",
+    "frame": 1020,
+    "seg": "seg6"
+   },
+   {
+    "kind": "place",
+    "frame": 1030,
+    "seg": "seg6"
+   },
+   {
+    "kind": "place",
+    "frame": 1066,
+    "seg": "seg6"
+   },
+   {
+    "kind": "place",
+    "frame": 1101,
+    "seg": "seg6"
+   },
+   {
+    "kind": "place",
+    "frame": 1112,
+    "seg": "seg6"
+   },
+   {
+    "kind": "place",
+    "frame": 1181,
+    "seg": "seg6"
+   },
+   {
+    "kind": "transition",
+    "frame": 1260,
+    "seg": "seg7"
+   },
+   {
+    "kind": "stamp",
+    "frame": 1269,
+    "seg": "seg7"
+   },
+   {
+    "kind": "ting",
+    "frame": 1290,
+    "seg": "seg7"
+   },
+   {
+    "kind": "transition",
+    "frame": 1440,
+    "seg": "seg8"
+   },
+   {
+    "kind": "place",
+    "frame": 1452,
+    "seg": "seg8"
+   },
+   {
+    "kind": "place",
+    "frame": 1462,
+    "seg": "seg8"
+   },
+   {
+    "kind": "transition",
+    "frame": 1590,
+    "seg": "seg9"
+   },
+   {
+    "kind": "click",
+    "frame": 1636,
+    "seg": "seg9"
+   },
+   {
+    "kind": "stamp",
+    "frame": 1649,
+    "seg": "seg9"
+   }
+  ],
+  "thumb": {
+   "lines": [
+    "小野妹子は",
+    "女性だったのか"
+   ],
+   "stamp": "女性？",
+   "parts": [
+    {
+     "name": "boat",
+     "x": 540,
+     "y": 1000,
+     "s": 1.3,
+     "at": 0
+    }
+   ],
+   "person": true
+  },
+  "totalFrames": 1740
+ }
+]
