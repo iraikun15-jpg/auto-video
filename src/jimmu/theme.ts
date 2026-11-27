@@ -17,6 +17,9 @@ export const SUGI = "#4F6B3A"; // 杉の緑（崇神回）
 export const SEIDO = "#3F7F77"; // 青銅の緑青（出雲回）
 export const TOKI = "#C66B7A"; // 朱鷺色（推古回の見出し）
 export const KOBAI = "#A9465A"; // 紅梅色（推古）
+export const KON = "#26355A"; // 紺（聖徳太子回の主役・見出し）
+export const FUJI = "#8E7CC3"; // 藤色（聖徳太子回の伝説＝夢の場面）
+export const SEPIA = "#7A5E3A"; // 記録の場面の茶
 /** 冠位十二階の色（徳・仁・礼・信・義・智） */
 export const KAN_I = ["#5E3C78", "#2F5D8A", "#C2412D", "#D9B03A", "#F2EEE4", "#211D1A"];
 /** チャンネル名（2026-12 から新名） */

@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo" | "suiko"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo" | "suiko" | "shotoku"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
   const dark = night ?? (look === "kusanagi" ? 1 : 0);
@@ -80,8 +80,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : look === "suiko" ? <LotusPetals f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : look === "suiko" ? <KaniIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : look === "suiko" ? <LotusPetals f={f} /> : look === "shotoku" ? <Palmettes f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : look === "suiko" ? <KaniIn f={f} /> : look === "shotoku" ? <HaloIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
@@ -150,6 +150,47 @@ const KaniIn: React.FC<{ f: number }> = ({ f }) => {
           </g>
         );
       })}
+    </g>
+  );
+};
+
+/** 忍冬唐草（飛鳥の寺の文様）の金の小片がゆっくり舞う（聖徳太子回） */
+const Palmettes: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 8 }, (_, i) => {
+      const speed = 0.35 + random(`pm${i}`) * 0.5;
+      const y = ((random(`pmy${i}`) * (H + 300) + f * speed) % (H + 300)) - 150;
+      const x = random(`pmx${i}`) * W + Math.sin(f * 0.02 + i * 2.1) * 50;
+      const flip = Math.cos(f * 0.04 + i * 1.3);
+      return (
+        <g key={i} transform={`translate(${x},${y}) rotate(${Math.sin(f * 0.03 + i) * 30 + i * 45}) scale(${(0.5 + Math.abs(flip) * 0.5) * (0.8 + random(`pms${i}`) * 0.5)},1)`} opacity={0.6}>
+          {/* 三つ葉の忍冬（パルメット）と巻きひげ */}
+          <path d="M0,10 Q-4,-14 0,-30 Q4,-14 0,10Z" fill={KIN} />
+          <path d="M0,10 Q-20,-4 -24,-20 Q-8,-10 0,10Z" fill={KIN} />
+          <path d="M0,10 Q20,-4 24,-20 Q8,-10 0,10Z" fill={KIN} />
+          <path d="M0,10 Q-6,22 6,26 Q16,26 12,16" fill="none" stroke={KIN} strokeWidth={3} />
+        </g>
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：紺の幕に光背（舟形の光）の形の窓が開いて広がる（聖徳太子回） */
+const HaloIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 16, Easing.in(Easing.quad));
+  if (t >= 1) return null;
+  const k = 0.02 + t * 2.6;
+  const cx = W / 2;
+  const cy = H * 0.52;
+  // 舟形光背（下が丸く、上がとがる）
+  const hx = 420 * k;
+  const hy = 620 * k;
+  const halo = `M${cx},${cy - hy} C${cx + hx * 0.55},${cy - hy * 0.55} ${cx + hx},${cy - hy * 0.1} ${cx + hx},${cy + hy * 0.3} C${cx + hx},${cy + hy * 0.75} ${cx + hx * 0.5},${cy + hy * 0.62} ${cx},${cy + hy * 0.62} C${cx - hx * 0.5},${cy + hy * 0.62} ${cx - hx},${cy + hy * 0.75} ${cx - hx},${cy + hy * 0.3} C${cx - hx},${cy - hy * 0.1} ${cx - hx * 0.55},${cy - hy * 0.55} ${cx},${cy - hy}Z`;
+  return (
+    <g>
+      <path d={`M-10,-10 H${W + 10} V${H + 10} H-10Z ${halo}`} fill="#1F2B4A" fillRule="evenodd" />
+      <path d={halo} fill="none" stroke={KIN} strokeWidth={14} />
+      <path d={halo} fill="none" stroke={KIN} strokeWidth={4} transform={`translate(${cx},${cy}) scale(1.06) translate(${-cx},${-cy})`} opacity={0.6} />
     </g>
   );
 };

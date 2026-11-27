@@ -31,6 +31,9 @@ import { IzumoThumbnail } from "./izumo/Thumbnail";
 import { TOTAL_FRAMES as IZUMO_FRAMES } from "./izumo/events";
 import { Suiko } from "./suiko/SuikoVideo";
 import { SuikoThumbnail } from "./suiko/Thumbnail";
+import { Shotoku } from "./shotoku/ShotokuVideo";
+import { ShotokuThumbnail } from "./shotoku/Thumbnail";
+import { TOTAL_FRAMES as SHOTOKU_FRAMES } from "./shotoku/events";
 import { TOTAL_FRAMES as SUIKO_FRAMES } from "./suiko/events";
 
 export const RemotionRoot: React.FC = () => {
@@ -127,6 +130,10 @@ export const RemotionRoot: React.FC = () => {
       {/* あった？なかった？古代史 第9本「推古天皇はお飾りだったのか」（BGM・効果音入り） */}
       <Composition id="Suiko" component={Suiko} width={1080} height={1920} fps={30} durationInFrames={SUIKO_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="SuikoThumbnail" component={SuikoThumbnail} width={1080} height={1920} />
+
+      {/* あった？なかった？古代史 第10本「聖徳太子は実在したのか」（BGM・効果音入り） */}
+      <Composition id="Shotoku" component={Shotoku} width={1080} height={1920} fps={30} durationInFrames={SHOTOKU_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="ShotokuThumbnail" component={ShotokuThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition
