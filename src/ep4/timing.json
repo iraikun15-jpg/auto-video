@@ -1,0 +1,23 @@
+{
+  "fps": 30,
+  "holdFrames": 9,
+  "segments": [
+    { "id": "seg1", "frames": 90, "label": "フック（財布の中身が3ケタ）" },
+    { "id": "seg2", "frames": 300, "label": "小ネタ1 値段を3回見る" },
+    { "id": "seg3", "frames": 330, "label": "小ネタ2 来月から節約する" },
+    { "id": "seg4", "frames": 330, "label": "小ネタ3 給料日だけ気が大きくなる" },
+    { "id": "seg5", "frames": 240, "label": "二択締め" }
+  ],
+  "marks": [
+    { "segment": "seg1", "frame": 28, "note": "財布を逆さにして振り始める" },
+    { "segment": "seg2", "frame": 24, "note": "値段札を見る 1回目" },
+    { "segment": "seg2", "frame": 64, "note": "値段札を見る 2回目" },
+    { "segment": "seg2", "frame": 104, "note": "値段札を見る 3回目（顔を近づけて大げさに）" },
+    { "segment": "seg2", "frame": 256, "note": "おにぎり1個をレジに置く（後ろの人の視線）" },
+    { "segment": "seg3", "frame": 20, "note": "カレンダーをめくる 1回目（以後46フレームごと・計5回）" },
+    { "segment": "seg3", "frame": 250, "note": "財布を開ける→小銭3枚" },
+    { "segment": "seg4", "frame": 6, "note": "給料日：財布がパンパンに膨らむ" },
+    { "segment": "seg4", "frame": 206, "note": "カレンダーが1週間進む（豪遊の演出が消える）" },
+    { "segment": "seg4", "frame": 240, "note": "財布を開けて真っ青" }
+  ]
+}

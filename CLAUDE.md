@@ -15,8 +15,8 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
 - フォントは `@remotion/google-fonts` の Noto Sans JP（weight 900）
 
 ## 自動公開（.github/workflows/render.yml）
-- push（.md だけの変更は除く）で第2話・第3話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
-- 最新の結合版（現在は第3話）は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
+- push（.md だけの変更は除く）で第2話・第3話・第4話・怪獣 v1/v2/v4 をレンダリングし、`video-<実行番号>` の Release を作る
+- 最新の結合版（現在は第4話）は常に `https://github.com/iraikun15-jpg/auto-video/releases/latest/download/video.mp4`
 - 個別ファイルは `https://github.com/iraikun15-jpg/auto-video/releases/download/video-<番号>/<ファイル名>`
 - Google Drive へのアップロード手順もあるが、Secrets（GDRIVE_*）が未登録なのでスキップされる。依頼者は Releases で受け取る方式を選んだ
 
@@ -34,6 +34,11 @@ Remotion で縦型ショート動画を作るリポジトリ。依頼者はス�
   - 第3話で追加したシリーズ部品: 友達 `Friend`（青 `#1E6FD9`、`theme.ts` の `FRIEND_BLUE`）、笑顔 `Face`、`walkPose`、
     駅前 `rig/station.tsx`、めくれるカレンダー `rig/calendar.tsx`、スマホ画面 `rig/phone.tsx`、
     「いつもの店」一式 `rig/shop.tsx`（`ShopScene` と `SHOP` の座標で構図固定。店員は黒＋前掛け・はちまきで色を増やさない）
+- 第4話「給料日前の財布あるある」: `src/ep4/`、書き出しは `npm run render:ep4`（出力は `out/ep4/`）
+  - 開幕は1フレーム目からフック文字（導入ショットなし）が依頼者の方針
+  - 追加部品: 財布 `rig/wallet.tsx`（開く・逆さ・膨らむ `bulge`・小銭）、コンビニ棚とレジ `rig/konbini.tsx`、
+    寿司・カフェ・紙袋・集中線・紙吹雪 `rig/treats.tsx`。後ろに並ぶ人は `Friend`（青）を流用
+- Release は Actions の最後（怪獣 v4 の書き出し後、push から約15〜20分）にできる。それまで latest は前回分を指すので、依頼者にはその旨も伝える
 
 ## 怪獣シリーズ（3D・Three.js）
 - オリジナルの様式化デザイン。**公式モデル・画像・音源の模倣や流用はしない**。画面に作品名を出さない
