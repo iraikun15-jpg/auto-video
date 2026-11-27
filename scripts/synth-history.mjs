@@ -373,17 +373,48 @@ const measure = (file) => {
   const sum = r.slice(r.lastIndexOf("Summary:"));
   return { I: Number(/I:\s+(-?[0-9.]+) LUFS/.exec(sum)[1]), peak: Number(/Peak:\s+(-?[0-9.]+) dBFS/.exec(sum)[1]) };
 };
-let peak = 0;
-for (let i = 0; i < N; i++) peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]));
+/**
+ * 一瞬の大きな音（判子・太鼓）だけを抑えるリミッター。
+ * 長尺は静かな BGM が長く続くので、ピークだけで音量を決めると全体が小さくなりすぎる。
+ * 5ミリ秒先読みで下げ、0.15秒かけて戻す。
+ */
+const limitPeaks = (ceil) => {
+  const look = Math.round(0.005 * SR);
+  const rel = Math.exp(-1 / (0.15 * SR));
+  const need = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const a = Math.max(Math.abs(L[i]), Math.abs(R[i]));
+    need[i] = a > ceil ? ceil / a : 1;
+  }
+  let g = 1;
+  for (let i = 0; i < N; i++) {
+    let target = 1;
+    for (let k = i; k < Math.min(N, i + look); k++) if (need[k] < target) target = need[k];
+    g = target < g ? target : target + (g - target) * rel;
+    L[i] *= g;
+    R[i] *= g;
+  }
+};
+const peakOf = () => {
+  let p = 0;
+  for (let i = 0; i < N; i++) p = Math.max(p, Math.abs(L[i]), Math.abs(R[i]));
+  return p;
+};
 const dir = `public/history/${id}`;
 mkdirSync(dir, { recursive: true });
 const file = `${dir}/audio.wav`;
-let gain = 0.5 / peak;
+const limit = Math.pow(10, -7.6 / 20); // 測定はトゥルーピーク（サンプルの間の山）なので余裕を持たせる
+let gain = 0.5 / peakOf();
 writeWav(file, gain);
 const m = measure(file);
 gain *= Math.pow(10, (A.lufs - m.I) / 20);
-const limit = Math.pow(10, -6.6 / 20); // 測定はトゥルーピークなので少し余裕を持たせる
-if (peak * gain > limit) gain = limit / peak;
+// 目標の大きさにすると上限を超えるところだけリミッターで抑える
+for (let i = 0; i < N; i++) {
+  L[i] *= gain;
+  R[i] *= gain;
+}
+limitPeaks(limit);
+gain = 1;
 writeWav(file, gain);
 const m2 = measure(file);
 console.log(`${file} ${DUR.toFixed(2)}秒 / ${m2.I} LUFS / ピーク ${m2.peak} dBFS`);
