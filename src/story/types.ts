@@ -46,9 +46,23 @@ export type Segment = {
   start: number;
   frames: number;
   texts: TextItem[];
+  background?: string; // セグメントだけ背景を変えるとき
+  props?: PropItem[]; // セグメントだけ小道具を変えるとき
 };
 
-export type PropItem = { type: string; x?: number; y?: number; width?: number; tilt?: number; front?: boolean };
+export type PropItem = {
+  type: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  tilt?: number;
+  front?: boolean; // 人物より手前に描く
+  open?: number; // ドアの開き 0〜1
+  count?: number;
+  on?: boolean; // テレビが点いている
+  text?: string; // ホワイトボードの板書
+  time?: string; // 時計の時刻 "17:59"
+};
 
 export type Episode = {
   id: string;

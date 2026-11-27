@@ -67,11 +67,36 @@
     "机": "desk",
     "椅子": "chair",
     "プリンター": "printer",
-    "紙束": "ream"
+    "紙束": "ream",
+    "時計": "clock",
+    "窓": "window",
+    "ホワイトボード": "whiteboard",
+    "会議机": "table",
+    "ドア": "door",
+    "棚": "shelf",
+    "レジ": "register",
+    "ソファ": "sofa",
+    "テレビ": "tv",
+    "ベッド": "bed",
+    "自販機": "vending",
+    "観葉植物": "plant",
+    "ゴミ箱": "trash",
+    "コーヒー": "coffee",
+    "書類の山": "papers",
+    "段ボール": "box",
+    "吊り革": "straps",
+    "木": "tree",
+    "電柱": "pole"
   },
   "backgrounds": {
     "床": "floor",
-    "なし": "none"
+    "なし": "none",
+    "オフィス": "office",
+    "会議室": "meeting",
+    "電車": "train",
+    "コンビニ": "store",
+    "自宅": "home",
+    "屋外": "outdoor"
   },
   "colors": {
     "黒": "ink",

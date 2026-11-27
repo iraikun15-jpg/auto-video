@@ -111,21 +111,32 @@ const buildEpisode = (file) => {
   if (Object.keys(cast).length === 0) fail(W(""), "「登場人物」が1人もいません");
 
   // 背景・小道具
-  const background = lookup(NAMES.backgrounds, raw.背景 ?? "床");
-  if (!background) fail(W("背景"), `「${raw.背景}」はありません。使える背景: ${list(NAMES.backgrounds)}`);
-  const props = (raw.小道具 ?? []).map((p, i) => {
-    const where = W(`小道具 ${i + 1}個目`);
+  const readBackground = (v, where) => {
+    const bg = lookup(NAMES.backgrounds, v);
+    if (!bg) fail(where, `「${v}」はありません。使える背景: ${list(NAMES.backgrounds)}`);
+    return bg;
+  };
+  const readProps = (arr, prefix) => (arr ?? []).map((p, i) => {
+    const where = W(`${prefix}小道具 ${i + 1}個目`);
     const type = lookup(NAMES.props, p?.種類);
     if (!type) fail(where, `「種類: ${p?.種類}」はありません。使える小道具: ${list(NAMES.props)}`);
     const opts = {};
     for (const [k, v] of Object.entries(p)) {
       if (k === "種類") continue;
-      if (k === "x" || k === "y" || k === "幅" || k === "傾き") opts[{ x: "x", y: "y", 幅: "width", 傾き: "tilt" }[k]] = num(v, where, k);
+      const NUM = { x: "x", y: "y", 幅: "width", 傾き: "tilt", 開き: "open", 数: "count" };
+      if (k in NUM) opts[NUM[k]] = num(v, where, k);
       else if (k === "前") opts.front = v === true;
-      else fail(where, `「${k}」という指定はありません。使えるのは 種類・x・y・幅・傾き・前`);
+      else if (k === "点く") opts.on = v === true;
+      else if (k === "文") opts.text = String(v);
+      else if (k === "時刻") {
+        if (!/^\d{1,2}:\d{2}$/.test(String(v))) fail(where, `「時刻」は "17:59" のように書いてください（いま: ${v}）`);
+        opts.time = String(v);
+      } else fail(where, `「${k}」という指定はありません。使えるのは 種類・x・y・幅・傾き・前・開き・数・点く・文・時刻`);
     }
     return { type, ...opts };
   });
+  const background = readBackground(raw.背景 ?? "床", W("背景"));
+  const props = readProps(raw.小道具, "");
 
   // セグメント
   const segsRaw = raw.セグメント ?? [];
@@ -185,7 +196,10 @@ const buildEpisode = (file) => {
       };
     });
 
-    segments.push({ id: sid, label: String(s.内容 ?? ""), script: String(s.台本 ?? ""), start, frames, texts });
+    // セグメントごとに背景・小道具を変えられる（書かなければ全体の設定）
+    const segBg = s.背景 === undefined ? undefined : readBackground(s.背景, `${where} の背景`);
+    const segProps = s.小道具 === undefined ? undefined : readProps(s.小道具, `${sid} の`);
+    segments.push({ id: sid, label: String(s.内容 ?? ""), script: String(s.台本 ?? ""), start, frames, texts, background: segBg, props: segProps });
     start = end;
   });
   // 同じ時刻の動きは書いた順のまま、時刻順に並べる

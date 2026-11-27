@@ -725,5 +725,336 @@
    ]
   },
   "totalFrames": 300
+ },
+ {
+  "id": "scenery-demo",
+  "title": "背景と小道具の見本",
+  "release": false,
+  "fps": 30,
+  "hold": 9,
+  "background": "floor",
+  "props": [],
+  "cast": {
+   "上司": {
+    "color": "red",
+    "tie": true,
+    "x": 200,
+    "facing": 1,
+    "pose": "STAND",
+    "always": false
+   },
+   "主人公": {
+    "color": "ink",
+    "tie": false,
+    "x": 300,
+    "facing": 1,
+    "pose": "STAND",
+    "always": true
+   }
+  },
+  "segments": [
+   {
+    "id": "office",
+    "label": "",
+    "script": "",
+    "start": 0,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 0,
+      "end": 45,
+      "text": "オフィス",
+      "color": "ink"
+     }
+    ],
+    "background": "office",
+    "props": [
+     {
+      "type": "chair",
+      "x": 420
+     },
+     {
+      "type": "desk",
+      "x": 620
+     },
+     {
+      "type": "coffee",
+      "x": 680,
+      "y": 1310
+     },
+     {
+      "type": "papers",
+      "x": 900,
+      "y": 1310,
+      "count": 5
+     }
+    ]
+   },
+   {
+    "id": "meeting",
+    "label": "",
+    "script": "",
+    "start": 45,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 45,
+      "end": 90,
+      "text": "会議室",
+      "color": "ink"
+     }
+    ],
+    "background": "meeting",
+    "props": [
+     {
+      "type": "table",
+      "x": 560,
+      "width": 480
+     }
+    ]
+   },
+   {
+    "id": "train",
+    "label": "",
+    "script": "",
+    "start": 90,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 90,
+      "end": 135,
+      "text": "電車",
+      "color": "ink"
+     }
+    ],
+    "background": "train",
+    "props": []
+   },
+   {
+    "id": "store",
+    "label": "",
+    "script": "",
+    "start": 135,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 135,
+      "end": 180,
+      "text": "コンビニ",
+      "color": "ink"
+     }
+    ],
+    "background": "store",
+    "props": [
+     {
+      "type": "register",
+      "x": 600
+     }
+    ]
+   },
+   {
+    "id": "home",
+    "label": "",
+    "script": "",
+    "start": 180,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 180,
+      "end": 225,
+      "text": "自宅",
+      "color": "ink"
+     }
+    ],
+    "background": "home",
+    "props": [
+     {
+      "type": "sofa",
+      "x": 80
+     },
+     {
+      "type": "tv",
+      "x": 700,
+      "on": true
+     },
+     {
+      "type": "plant",
+      "x": 560
+     }
+    ]
+   },
+   {
+    "id": "outdoor",
+    "label": "",
+    "script": "",
+    "start": 225,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 225,
+      "end": 270,
+      "text": "屋外",
+      "color": "ink"
+     }
+    ],
+    "background": "outdoor",
+    "props": [
+     {
+      "type": "vending",
+      "x": 640
+     },
+     {
+      "type": "trash",
+      "x": 540
+     }
+    ]
+   },
+   {
+    "id": "misc",
+    "label": "",
+    "script": "",
+    "start": 270,
+    "frames": 45,
+    "texts": [
+     {
+      "start": 270,
+      "end": 315,
+      "text": "その他の小道具",
+      "color": "ink"
+     }
+    ],
+    "background": "floor",
+    "props": [
+     {
+      "type": "clock",
+      "x": 40,
+      "y": 660,
+      "time": "17:59"
+     },
+     {
+      "type": "window",
+      "x": 200,
+      "y": 650,
+      "width": 220
+     },
+     {
+      "type": "whiteboard",
+      "x": 470,
+      "width": 300,
+      "text": "今期目標"
+     },
+     {
+      "type": "door",
+      "x": 830,
+      "open": 0.4
+     },
+     {
+      "type": "box",
+      "x": 640
+     },
+     {
+      "type": "bed",
+      "x": 10,
+      "width": 420
+     }
+    ]
+   }
+  ],
+  "actions": [
+   {
+    "who": "主人公",
+    "start": 0,
+    "kind": "pose",
+    "code": "SIT_TYPE",
+    "seg": 0,
+    "opts": {
+     "x": 480
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 45,
+    "kind": "pose",
+    "code": "POINT",
+    "seg": 1,
+    "opts": {
+     "x": 230
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 90,
+    "kind": "pose",
+    "code": "RAISE_HAND",
+    "seg": 2,
+    "opts": {
+     "x": 600
+    }
+   },
+   {
+    "who": "上司",
+    "start": 90,
+    "kind": "pose",
+    "code": "SIT_PHONE",
+    "seg": 2,
+    "opts": {
+     "x": 260
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 135,
+    "kind": "pose",
+    "code": "CARRY",
+    "seg": 3,
+    "opts": {
+     "x": 420
+    }
+   },
+   {
+    "who": "上司",
+    "start": 135,
+    "kind": "motion",
+    "code": "exit",
+    "seg": 3,
+    "opts": {}
+   },
+   {
+    "who": "主人公",
+    "start": 180,
+    "kind": "pose",
+    "code": "SIT_PHONE",
+    "seg": 4,
+    "opts": {
+     "x": 170
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 225,
+    "kind": "motion",
+    "code": "walk",
+    "seg": 5,
+    "opts": {
+     "x": 150,
+     "to": 420
+    }
+   },
+   {
+    "who": "主人公",
+    "start": 270,
+    "kind": "pose",
+    "code": "ARMS_CROSSED",
+    "seg": 6,
+    "opts": {
+     "x": 560
+    }
+   }
+  ],
+  "thumbnail": {
+   "frame": 0,
+   "texts": []
+  },
+  "totalFrames": 315
  }
 ]

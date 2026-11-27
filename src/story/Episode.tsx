@@ -55,7 +55,10 @@ const BigText: React.FC<{ item: TextItem; f: number; animate: boolean }> = ({ it
 /** 結合版でのフレーム f の画面（文字は texts で渡す） */
 const Scene: React.FC<{ ep: Episode; f: number; texts: TextItem[]; animateText: boolean }> = ({ ep, f, texts, animateText }) => {
   const prep = useMemo(() => prepare(ep), [ep]);
-  const Bg = Backgrounds[ep.background] ?? Backgrounds.floor;
+  // いまのセグメントの背景・小道具（セグメントで指定がなければ全体の設定）
+  const seg = ep.segments.find((s) => f >= s.start && f < s.start + s.frames) ?? ep.segments[ep.segments.length - 1];
+  const Bg = Backgrounds[seg.background ?? ep.background] ?? Backgrounds.floor;
+  const props = seg.props ?? ep.props;
   const states = Object.fromEntries(Object.keys(ep.cast).map((name) => [name, characterAt(ep, prep, name, f)]));
   const anchor = (who: string): Anchor => {
     const s = states[who];
@@ -74,8 +77,8 @@ const Scene: React.FC<{ ep: Episode; f: number; texts: TextItem[]; animateText: 
     <AbsoluteFill style={{ backgroundColor: BG }}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
         <g transform={`translate(${sx} ${sy})`}>
-          <Bg />
-          {ep.props.filter((p) => !p.front).map((p, i) => (
+          <Bg f={f} />
+          {props.filter((p) => !p.front).map((p, i) => (
             <PropView key={`b${i}`} item={p} f={f} />
           ))}
           {screen("dim").map((e, i) => (
@@ -90,7 +93,7 @@ const Scene: React.FC<{ ep: Episode; f: number; texts: TextItem[]; animateText: 
             if (!s.visible) return null;
             return <StickFigure key={name} pose={s.pose} facing={s.facing} color={COLORS[c.color]} tie={c.tie} />;
           })}
-          {ep.props.filter((p) => p.front).map((p, i) => (
+          {props.filter((p) => p.front).map((p, i) => (
             <PropView key={`f${i}`} item={p} f={f} />
           ))}
           {active
