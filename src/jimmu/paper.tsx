@@ -50,7 +50,7 @@ export const Stage: React.FC<{
   tintOpacity?: number;
   f?: number; // セグメント内フレーム（海の波・舞う紙片・めくり用）
   peel?: boolean; // 冒頭の場面転換を入れるか
-  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo" | "suiko"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
+  look?: "jimmu" | "takeru" | "sujin" | "kusanagi" | "yuryaku" | "himiko" | "keitai" | "izumo" | "suiko" | "tenmu"; // 回ごとの見た目（舞うもの・場面転換）。jimmu=金の小片＋紙めくり、takeru=白い羽根＋巻物、sujin=杉の葉＋御簾、kusanagi=夜の和紙＋光の粒＋剣閃
   night?: number; // 夜の和紙の濃さ（kusanagi の既定は 1。0 で生成りの和紙）
 }> = ({ children, tint, tintOpacity = 0, f = 0, peel = true, look = "jimmu", night }) => {
   const dark = night ?? (look === "kusanagi" ? 1 : 0);
@@ -80,8 +80,8 @@ export const Stage: React.FC<{
         <stop offset="100%" stopColor="#3a2410" stopOpacity={0.35} />
       </radialGradient>
       <rect width={W} height={H} fill="url(#vignette)" />
-      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : look === "suiko" ? <LotusPetals f={f} /> : <Flecks f={f} />}
-      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : look === "suiko" ? <KaniIn f={f} /> : <PeelIn f={f} /> : null}
+      {look === "takeru" ? <Feathers f={f} /> : look === "sujin" ? <SugiLeaves f={f} /> : look === "kusanagi" ? <Motes f={f} /> : look === "yuryaku" ? <FloatingGlyphs f={f} /> : look === "himiko" ? <MirrorGlints f={f} /> : look === "keitai" ? <Ripples f={f} /> : look === "izumo" ? <Yakumo f={f} /> : look === "suiko" ? <LotusPetals f={f} /> : look === "tenmu" ? <RedStrips f={f} /> : <Flecks f={f} />}
+      {peel ? look === "takeru" ? <ScrollIn f={f} /> : look === "sujin" ? <MisuIn f={f} /> : look === "kusanagi" ? <SlashIn f={f} /> : look === "yuryaku" ? <XrayIn f={f} /> : look === "himiko" ? <PageTurnIn f={f} /> : look === "keitai" ? <FusumaIn f={f} /> : look === "izumo" ? <CloudIn f={f} /> : look === "suiko" ? <KaniIn f={f} /> : look === "tenmu" ? <SmokeIn f={f} /> : <PeelIn f={f} /> : null}
     </svg>
     <Img src={staticFile("jimmu/washi_fibers.png")} style={{ position: "absolute", width: W, height: H, opacity: dark > 0 ? 0.6 - 0.35 * dark : 0.6 }} />
   </AbsoluteFill>
@@ -113,6 +113,43 @@ const Flecks: React.FC<{ f: number }> = ({ f }) => (
     })}
   </g>
 );
+
+/** 赤い布の切れ端が風にたなびいて流れる（天武回：大海人方の目印の赤） */
+const RedStrips: React.FC<{ f: number }> = ({ f }) => (
+  <g>
+    {Array.from({ length: 8 }, (_, i) => {
+      const speed = 0.9 + random(`rs${i}`) * 0.9;
+      const x = ((random(`rsx${i}`) * (W + 300) + f * speed) % (W + 300)) - 150;
+      const y = 200 + random(`rsy${i}`) * (H - 400) + Math.sin(f * 0.04 + i) * 30;
+      const wav = Math.sin(f * 0.25 + i * 2) * 8;
+      return (
+        <path
+          key={i}
+          d={`M${x},${y} q20,${wav} 40,0 t40,0 l0,10 q-20,${-wav} -40,0 t-40,0Z`}
+          fill="#C2412D"
+          opacity={0.45}
+        />
+      );
+    })}
+  </g>
+);
+
+/** 冒頭：のろしの白い煙が下から湧き上がり、上へ抜けて晴れる（天武回） */
+const SmokeIn: React.FC<{ f: number }> = ({ f }) => {
+  const t = ramp(f, 0, 16, Easing.in(Easing.quad));
+  if (t >= 1) return null;
+  const up = -t * (H + 600);
+  return (
+    <g transform={`translate(0,${up})`}>
+      <rect x={0} y={-200} width={W} height={H + 400} fill="#ECE6DA" />
+      {Array.from({ length: 14 }, (_, i) => {
+        const cx = (i % 5) * 270 + (Math.floor(i / 5) % 2) * 130;
+        const cy = H + 220 + Math.floor(i / 5) * 140;
+        return <circle key={i} cx={cx} cy={cy} r={260} fill={i % 2 ? "#E4DCCB" : "#F2EDE2"} />;
+      })}
+    </g>
+  );
+};
 
 /** 蓮の花びらがひらひら舞い落ちる（推古回：仏教が栄えた飛鳥の時代） */
 const LotusPetals: React.FC<{ f: number }> = ({ f }) => (

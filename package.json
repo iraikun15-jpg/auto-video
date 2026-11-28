@@ -16,7 +16,8 @@
     "render:himiko": "node scripts/render-himiko.mjs",
     "render:keitai": "node scripts/render-keitai.mjs",
     "render:izumo": "node scripts/render-izumo.mjs",
-    "render:suiko": "node scripts/render-suiko.mjs"
+    "render:suiko": "node scripts/render-suiko.mjs",
+    "render:tenmu": "node scripts/render-tenmu.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "8.18.0",

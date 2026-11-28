@@ -32,6 +32,9 @@ import { TOTAL_FRAMES as IZUMO_FRAMES } from "./izumo/events";
 import { Suiko } from "./suiko/SuikoVideo";
 import { SuikoThumbnail } from "./suiko/Thumbnail";
 import { TOTAL_FRAMES as SUIKO_FRAMES } from "./suiko/events";
+import { Tenmu } from "./tenmu/TenmuVideo";
+import { TenmuThumbnail } from "./tenmu/Thumbnail";
+import { TOTAL_FRAMES as TENMU_FRAMES } from "./tenmu/events";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -127,6 +130,10 @@ export const RemotionRoot: React.FC = () => {
       {/* あった？なかった？古代史 第9本「推古天皇はお飾りだったのか」（BGM・効果音入り） */}
       <Composition id="Suiko" component={Suiko} width={1080} height={1920} fps={30} durationInFrames={SUIKO_FRAMES} defaultProps={{ withAudio: true }} />
       <Still id="SuikoThumbnail" component={SuikoThumbnail} width={1080} height={1920} />
+
+      {/* あった？なかった？古代史 Ep11「天武天皇は壬申の乱に負けていたら？」（BGM・効果音入り） */}
+      <Composition id="Tenmu" component={Tenmu} width={1080} height={1920} fps={30} durationInFrames={TENMU_FRAMES} defaultProps={{ withAudio: true }} />
+      <Still id="TenmuThumbnail" component={TenmuThumbnail} width={1080} height={1920} />
 
       {/* 最初に作ったサンプル */}
       <Composition
